@@ -6,7 +6,6 @@ import android.view.Gravity
 import android.view.View
 import android.view.ViewManager
 import android.widget.*
-import androidx.viewpager2.widget.ViewPager2
 import org.jetbrains.anko.*
 import org.jetbrains.anko.custom.ankoView
 
