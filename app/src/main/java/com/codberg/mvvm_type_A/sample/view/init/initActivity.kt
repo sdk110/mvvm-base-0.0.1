@@ -2,6 +2,8 @@ package com.codberg.mvvm_type_A.sample.view.init
 
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
+import android.content.res.ColorStateList
+import android.graphics.Color
 import com.codberg.mvvm_type_A.sample.view.MainViewManager
 
 import android.os.Bundle
@@ -11,19 +13,86 @@ import com.libs.cutil_kotlin.BaseKotlinActivity
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import com.codberg.mvvm_type_A.sample.viewmodel.ViewModel
 import com.libs.cutil_kotlin.BasicUtil
+import io.reactivex.observers.DisposableObserver
 import org.jetbrains.anko.contentView
 
 open class initActivity : BaseKotlinActivity<ViewModel>() {
-
     lateinit var initViewManager : MainViewManager
     lateinit var init : init_data
     var isDraw : Boolean = false
     override val viewModel: ViewModel by viewModel()
 
-    override fun onRemove(): Int = 3
+    override fun onCustomBackPressed(): Int = 3
     override fun onBackground(): Boolean = true
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        viewModel.observerUpdateUI = object : DisposableObserver<Boolean>() {
+            var status: Boolean = false
+            override fun onNext(t: Boolean) {
+                status = t
+            }
+            override fun onComplete() {
+                if(status) {
+                    init.apply {
+                        signup_contentView_Type_A_sub_parent_input_editTextView_phone.isEnabled = false
+                        signup_contentView_Type_A_sub__parent_input_button_phone.isClickable = false
+                        signup_contentView_Type_A_sub__parent_input_button_phone.backgroundTintList = ColorStateList.valueOf(
+                            Color.GRAY)
+                    }
+                }
+                else {
+                    init.apply {
+                        signup_contentView_Type_A_sub_parent_input_editTextView_phone.isEnabled = true
+                        signup_contentView_Type_A_sub__parent_input_button_phone.isClickable = true
+                        signup_contentView_Type_A_sub__parent_input_button_phone.backgroundTintList = null
+                        signup_contentView_Type_A_sub_parent_input_phone_auth_timer_textView.text = "남은 시간 0$auth_time:00"
+                    }
+                }
+
+                dispose()
+            }
+            override fun onError(e: Throwable) {}
+        }
+
+        viewModel.observerTimer = object : DisposableObserver<String>() {
+            override fun onComplete() {
+                initPhoneAuth()
+                viewModel.disposableTimer?.let {
+                    it.dispose()
+                }
+            }
+
+            override fun onNext(t: String) {
+                init.signup_contentView_Type_A_sub_parent_input_phone_auth_timer_textView.text = t
+            }
+
+            override fun onError(e: Throwable) {
+
+            }
+        }
+    }
+
+    override fun onRemoveVIew(key: String) {
+        when(key) {
+            "signup" -> {
+
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+    }
+
+    private fun initPhoneAuth() {
+        init.apply {
+            signup_contentView_Type_A_sub_parent_input_editTextView_phone.isEnabled = true
+            signup_contentView_Type_A_sub__parent_input_button_phone.isClickable = true
+            signup_contentView_Type_A_sub__parent_input_button_phone.backgroundTintList = null
+
+            signup_contentView_Type_A_sub_parent_input_phone_auth_timer_textView.text = "남은 시간 0$auth_time:00"
+        }
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {

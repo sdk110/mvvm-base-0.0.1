@@ -9,15 +9,36 @@ import com.codberg.mvvm_type_A.sample.model.request.request_testApi
 import com.codberg.mvvm_type_A.sample.model.response.singleTypeData_Response
 import com.codberg.mvvm_type_A.sample.model.response.listTypeData_Response
 import com.codberg.mvvm_type_A.sample.model.service.networkServiece
+import io.reactivex.Observable
+import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
+import io.reactivex.observers.DisposableObserver
 import io.reactivex.schedulers.Schedulers
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
+import java.util.concurrent.TimeUnit
 
 class ViewModel(private val model: networkServiece) : BaseKotlinViewModel(), AnkoLogger {
 
     private val TAG = "ViewModel"
+
+    private val compositeDisposable = CompositeDisposable()
+
+    var disposableTimer: Disposable? = null
+    var observerTimer: DisposableObserver<String>? = null
+
+    var observerUpdateUI: DisposableObserver<Boolean>? = null
+    var disposableUpdateUI: Disposable? = null
+
+    val updateUI = MutableLiveData<Boolean>()
+
     companion object  { val POST = 0; val GET  = 1 }
+
+    fun onBackPressed() {
+
+    }
 
     //리스트 타입 예시
     val _listType_ResponseLiveData = MutableLiveData<List<listTypeData_Response>>()
@@ -108,5 +129,65 @@ class ViewModel(private val model: networkServiece) : BaseKotlinViewModel(), Ank
         }
 
     }
+
+    fun phoneAuthInitUI() {
+        Observable.create<Boolean>{
+            it.onNext(false)
+            it.onComplete()
+        }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(observerUpdateUI!!)
+    }
+
+    fun requestPhoneAuth(phoneNumber: String, auth_time: Int) {
+        // 요청 직후 UI 업데이트
+        Observable.create<Boolean>{
+            it.onNext(true)
+            it.onComplete()
+        }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(observerUpdateUI!!)
+
+        // todo -> 휴대폰 번호 인증 요청
+
+        startRequestPhoneTimer(auth_time)
+    }
+
+    private fun startRequestPhoneTimer(auth_time: Int) {
+        var minit = auth_time - 1
+        var second = 60
+
+        disposableTimer = Observable.interval(1, TimeUnit.SECONDS).take((60 * auth_time).toLong())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe(
+                {
+                    if(second == 0) {
+                        minit--
+                        second = 59
+                    }
+                    else {
+                        second--
+                    }
+
+                    if(second == 59) observerTimer?.onNext("남은 시간 0$minit:$second")
+                    else {
+                        if(second < 10) observerTimer?.onNext("남은 시간 0$minit:0$second")
+                        else observerTimer?.onNext("남은 시간 0$minit:$second")
+                    }
+                },
+                { error ->
+                    observerTimer!!.onError(error)
+                },
+                {
+                    observerTimer?.let {
+                        it.onComplete()
+                    }
+                }
+            )
+    }
+
 
 }

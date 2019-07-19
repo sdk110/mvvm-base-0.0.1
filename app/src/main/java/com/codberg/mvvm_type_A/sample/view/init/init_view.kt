@@ -4,8 +4,11 @@ import android.content.Context
 import android.graphics.Color
 import android.view.Gravity
 import android.view.View
+import android.view.ViewManager
 import android.widget.*
+import androidx.viewpager2.widget.ViewPager2
 import org.jetbrains.anko.*
+import org.jetbrains.anko.custom.ankoView
 
 open class init_view(mCon : Context) {
 
@@ -137,6 +140,9 @@ open class init_view(mCon : Context) {
     lateinit var signup_contentView_Type_A_sub_parent_input_imageView_phone_auth: ImageView
     lateinit var signup_contentView_Type_A_sub_parent_input_editTextView_phone_auth: EditText
     lateinit var signup_contentView_Type_A_sub__parent_input_view_phone_auth: View
+    lateinit var signup_contentView_Type_A_sub__parent_input_button_phone_auth: Button
+    lateinit var signup_contentView_Type_A_sub_parent_input_phone_auth_timer_layout: RelativeLayout
+    lateinit var signup_contentView_Type_A_sub_parent_input_phone_auth_timer_textView: TextView
 
     // sub parent agree
     lateinit var signup_contentView_Type_A_sub_parent_agreement: LinearLayout
@@ -209,6 +215,11 @@ open class init_view(mCon : Context) {
                         signup_contentView_Type_A_sub_parent_input_imageView_phone_auth = imageView { }
                         signup_contentView_Type_A_sub_parent_input_editTextView_phone_auth = editText { }
                         signup_contentView_Type_A_sub__parent_input_view_phone_auth = view { }
+                        signup_contentView_Type_A_sub__parent_input_button_phone_auth = button { }
+                    }
+
+                    signup_contentView_Type_A_sub_parent_input_phone_auth_timer_layout = relativeLayout {
+                        signup_contentView_Type_A_sub_parent_input_phone_auth_timer_textView = textView {  }
                     }
                 }
 
@@ -252,7 +263,6 @@ open class init_view(mCon : Context) {
     /**----------------------------------------------------------------**/
 
     /** [main] ----------------------------------------------**/
-
     fun getMain_TYPE_A(mCon:Context) : View {
         return mCon.UI {
             verticalLayout {

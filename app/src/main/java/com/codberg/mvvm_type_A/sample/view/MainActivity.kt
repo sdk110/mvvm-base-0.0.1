@@ -15,4 +15,10 @@ class MainActivity : initActivity()  {
 
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        viewModel.onBackPressed()
+    }
+
+
 }
