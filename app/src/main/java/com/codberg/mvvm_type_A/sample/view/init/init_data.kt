@@ -283,7 +283,7 @@ data class init_data(var mCon : Context?) : init_view(mCon!!) {
     var use_signup_id_email         = true     // 아이디 or 이메일
     var use_signup_password         = true     // 비밀번호 입력
     var use_signup_password_confirm = true     // 비밀번호 입력 확인
-    var use_signup_name             = false     // 이름 입력
+    var use_signup_name             = true     // 이름 입력
     var use_signup_phone            = true     // 휴대폰 번호 입력
     var use_signup_phone_auth       = true     // 휴대폰 번호 인증
     var use_signup_agreement        = true     // 약관

@@ -117,44 +117,4 @@ class MainViewManager : initViewManager {
             }
         }.view
     }
-
-    /**
-     * 회원가입 휴대폰 인증 번호 요청 버튼에 대한 click listener
-     */
-    override fun onSignUpPhoneAuthButtonClick(mContext: initActivity, phoneNumber: String) {
-        // todo -> request verify phone number
-        Snackbar.make(mContext.contentView!!,"인증번호 요청 클릭", Snackbar.LENGTH_SHORT).show()
-    }
-
-    /**
-     * 회원가입 휴대폰 인증 번호 확인 버튼에 대한 click listener
-     */
-    override fun onSignUpPhoneAuthConfirmButtonClick(mContext: initActivity, authNumber: String): Boolean {
-        Snackbar.make(mContext.contentView!!,"인증번호 확인 클릭", Snackbar.LENGTH_SHORT).show()
-
-        return true
-    }
-
-    /**
-     * 회원가입 약관 Item1의 상세 보기 이동
-     */
-    override fun onSignUpShowAgreementItem1ButtonClick(mContext: initActivity) {
-        Snackbar.make(mContext.contentView!!,"이용약관 이동", Snackbar.LENGTH_SHORT).show()
-    }
-
-    /**
-     * 회원가입 약관 Item2의 상세 보기 이동
-     */
-    override fun onSignUpShowAgreementItem2ButtonClick(mContext: initActivity) {
-        Snackbar.make(mContext.contentView!!,"개인정보취급방침 이동", Snackbar.LENGTH_SHORT).show()
-    }
-
-    /**
-     * 회원가입 완료 버튼
-     */
-    override fun onSignUpAgreementButtonClick(mContext: initActivity, idEmail: String, password: String, name: String, phoneNumber: String, authNumber: String, agreement_all: Boolean ) {
-        Snackbar.make(mContext.contentView!!,"회원가입 완료", Snackbar.LENGTH_SHORT).show()
-    }
-
-
 }

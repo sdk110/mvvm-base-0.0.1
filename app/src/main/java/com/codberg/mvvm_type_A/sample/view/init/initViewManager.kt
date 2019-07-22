@@ -513,7 +513,7 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                                                 gravity = Gravity.CENTER_HORIZONTAL
                                                 orientation = LinearLayout.VERTICAL
                                                 isClickable = true
-                                        }
+                                            }
 
                                         if(signup_background != DATA_NONE)         backgroundResource = signup_background
                                         if(signup_backgroundColor != DATA_NONE)    backgroundColor = signup_backgroundColor
@@ -547,9 +547,6 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
 
                             override fun onRemove() {
                                 // todo -> 뷰가 없어지기 직전에 호출
-                                viewModel.disposableTimer?.let {
-                                    it.dispose()
-                                }
                             }
                         })
                     }
@@ -683,16 +680,6 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
     abstract  fun  onDraw_CUSTUM_VIEW_LOGIN(rUtil : ViewUtil?, rViewModel : ViewModel, rCon : initActivity, rinit : init_data): View?
 
     abstract  fun  onDraw_CUSTUM_VIEW_MAIN(rUtil : ViewUtil?, rViewModel : ViewModel, rCon : initActivity, rinit : init_data): View?
-
-    abstract  fun  onSignUpPhoneAuthButtonClick(mContext: initActivity, phoneNumber: String)
-
-    abstract  fun  onSignUpPhoneAuthConfirmButtonClick(mContext: initActivity, authNumber: String): Boolean
-
-    abstract  fun  onSignUpShowAgreementItem1ButtonClick(mContext: initActivity)
-
-    abstract  fun  onSignUpShowAgreementItem2ButtonClick(mContext: initActivity)
-
-    abstract  fun  onSignUpAgreementButtonClick(mContext: initActivity, idEmail: String, password: String, name: String, phoneNumber: String, authNumber: String, agreement_all: Boolean)
 
     /** [로그인화면_END]---------------------------------------------------------------------------------------------------------------------------------------------------**/
 
@@ -1108,6 +1095,7 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                 init.signup_contentView_Type_A_sub_parent_input_phone_auth.visibility = View.GONE
             }
 
+            // [인증번호 요청] 버튼
             sub_parent_input_button_phone.apply {
                 init.apply {
                     layoutParams = RelativeLayout.LayoutParams((width.toFloat() * passwordAuth_button_scaleX).toInt(), (height.toFloat() * passwordAuth_button_scaleY).toInt())
@@ -1210,6 +1198,7 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                 }
             }
 
+            // [인증번호 확인] 버튼
             sub_parent_input_button_phone_auth.apply {
                 init.apply {
                     layoutParams = RelativeLayout.LayoutParams((width.toFloat() * passwordAuth_confirm_button_scaleX).toInt(), (height.toFloat() * passwordAuth_confirm_button_scaleY).toInt())
@@ -1227,7 +1216,7 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                         }
 
                     setOnClickListener {
-                        onSignUpPhoneAuthConfirmButtonClick(con, sub_parent_input_editTextView_phone_auth.text.toString())
+                        viewModel.onSignUpPhoneAuthConfirmButtonClick(sub_parent_input_editTextView_phone_auth.text.toString())
                     }
                 }
             }
@@ -1331,15 +1320,6 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
 
                 onCheckedChange { buttonView, isChecked ->
                     isCheckedAll = isChecked
-
-//                    if(isChecked) {
-//                        init.signup_contentView_Type_A_sub_parent_agreement_item1_sub_checkBox.isChecked = true
-//                        init.signup_contentView_Type_A_sub_parent_agreement_item2_sub_checkBox.isChecked = true
-//                    }
-//                    else {
-//                        init.signup_contentView_Type_A_sub_parent_agreement_item1_sub_checkBox.isChecked = false
-//                        init.signup_contentView_Type_A_sub_parent_agreement_item2_sub_checkBox.isChecked = false
-//                    }
                 }
 
                 isClickable = false
@@ -1399,8 +1379,6 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                             gravity = Gravity.CENTER_VERTICAL
                         }
                     orientation = LinearLayout.HORIZONTAL
-
-//                    backgroundColor = Color.BLUE // 임시
                 }
 
                 sub_parent_agreement_item1_sub_checkBox.apply {
@@ -1455,7 +1433,7 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                 }
 
                 setOnClickListener {
-                    onSignUpShowAgreementItem1ButtonClick(con)
+                    viewModel.onSignUpShowAgreementItem1ButtonClick()
                 }
             }
         }
@@ -1535,8 +1513,6 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                 init.apply {
                     layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 
-//                    backgroundColor = Color.GRAY //  임시
-
                     text = agreement_checkBox_item2_show_text_value
                     textColor = agreement_checkBox_item2_show_text_color
                     textSize = agreement_checkBox_item2_show_text_size
@@ -1545,7 +1521,7 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                 }
 
                 setOnClickListener {
-                    onSignUpShowAgreementItem2ButtonClick(con)
+                    viewModel.onSignUpShowAgreementItem2ButtonClick()
                 }
             }
         }
@@ -1572,6 +1548,7 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                 gravity = Gravity.BOTTOM
             }
 
+            // [회원가입 완료] 버튼
             sub_parent_agreement_button.apply {
                 init.apply {
                     if(signup_complete_button_background_resource != DATA_NONE) {
@@ -1595,59 +1572,17 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
 
                 setOnClickListener {
                     init.apply {
-                        var signup_idEmail: String = signup_contentView_Type_A_sub_parent_input_editTextView_id_email.text.toString()
-                        var signup_password: String = signup_contentView_Type_A_sub_parent_input_editTextView_password.text.toString()
-                        var singup_phoneNumber: String = signup_contentView_Type_A_sub_parent_input_editTextView_password_confirm.text.toString()
-                        var singup_name: String = signup_contentView_Type_A_sub_parent_input_editTextView_name.text.toString()
-                        var singup_authNumber: String = signup_contentView_Type_A_sub_parent_input_editTextView_phone.text.toString()
-                        var singup_agreement_all = signup_contentView_Type_A_sub_parent_agreement_all_checkBox.isChecked
-
-                        onSignUpAgreementButtonClick(
-                            mContext = con,
-                            idEmail = signup_idEmail,
-                            password = signup_password,
-                            phoneNumber = singup_phoneNumber,
-                            name = singup_name,
-                            authNumber = singup_authNumber,
-                            agreement_all = singup_agreement_all )
-
-                        viewModel.disposableTimer?.let {
-                            it.dispose()
-                        }
-                        viewModel.phoneAuthInitUI()
+                        viewModel.onSignUpAgreementButtonClick(
+                            idEmail = signup_contentView_Type_A_sub_parent_input_editTextView_id_email.text.toString(),
+                            password = signup_contentView_Type_A_sub_parent_input_editTextView_password.text.toString(),
+                            phoneNumber = signup_contentView_Type_A_sub_parent_input_editTextView_password_confirm.text.toString(),
+                            name = signup_contentView_Type_A_sub_parent_input_editTextView_name.text.toString(),
+                            authNumber = signup_contentView_Type_A_sub_parent_input_editTextView_phone.text.toString(),
+                            agreement_all = signup_contentView_Type_A_sub_parent_agreement_all_checkBox.isChecked
+                        )
                     }
                 }
             }
-        }
-    }
-
-    private fun setObserverUpdateUI() {
-        viewModel.observerUpdateUI = object : DisposableObserver<Boolean>() {
-            var status: Boolean = false
-            override fun onNext(t: Boolean) {
-                status = t
-            }
-            override fun onComplete() {
-                if(status) {
-                    init.apply {
-                        signup_contentView_Type_A_sub_parent_input_editTextView_phone.isEnabled = false
-                        signup_contentView_Type_A_sub__parent_input_button_phone.isClickable = false
-                        signup_contentView_Type_A_sub__parent_input_button_phone.backgroundTintList = ColorStateList.valueOf(
-                            Color.GRAY)
-                    }
-                }
-                else {
-                    init.apply {
-                        signup_contentView_Type_A_sub_parent_input_editTextView_phone.isEnabled = true
-                        signup_contentView_Type_A_sub__parent_input_button_phone.isClickable = true
-                        signup_contentView_Type_A_sub__parent_input_button_phone.backgroundTintList = null
-                        signup_contentView_Type_A_sub_parent_input_phone_auth_timer_textView.text = "남은 시간 0$auth_time:00"
-                    }
-                }
-
-                dispose()
-            }
-            override fun onError(e: Throwable) {}
         }
     }
 

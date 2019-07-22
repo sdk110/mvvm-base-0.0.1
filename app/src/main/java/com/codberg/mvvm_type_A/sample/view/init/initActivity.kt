@@ -12,9 +12,12 @@ import androidx.interpolator.view.animation.FastOutLinearInInterpolator
 import com.libs.cutil_kotlin.BaseKotlinActivity
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import com.codberg.mvvm_type_A.sample.viewmodel.ViewModel
+import com.google.android.material.snackbar.Snackbar
 import com.libs.cutil_kotlin.BasicUtil
+import io.reactivex.Observer
+import io.reactivex.disposables.Disposable
 import io.reactivex.observers.DisposableObserver
-import org.jetbrains.anko.contentView
+import org.jetbrains.anko.*
 
 open class initActivity : BaseKotlinActivity<ViewModel>() {
     lateinit var initViewManager : MainViewManager
@@ -27,72 +30,23 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewModel.observerUpdateUI = object : DisposableObserver<Boolean>() {
-            var status: Boolean = false
-            override fun onNext(t: Boolean) {
-                status = t
-            }
-            override fun onComplete() {
-                if(status) {
-                    init.apply {
-                        signup_contentView_Type_A_sub_parent_input_editTextView_phone.isEnabled = false
-                        signup_contentView_Type_A_sub__parent_input_button_phone.isClickable = false
-                        signup_contentView_Type_A_sub__parent_input_button_phone.backgroundTintList = ColorStateList.valueOf(
-                            Color.GRAY)
-                    }
-                }
-                else {
-                    init.apply {
-                        signup_contentView_Type_A_sub_parent_input_editTextView_phone.isEnabled = true
-                        signup_contentView_Type_A_sub__parent_input_button_phone.isClickable = true
-                        signup_contentView_Type_A_sub__parent_input_button_phone.backgroundTintList = null
-                        signup_contentView_Type_A_sub_parent_input_phone_auth_timer_textView.text = "남은 시간 0$auth_time:00"
-                    }
-                }
-
-                dispose()
-            }
-            override fun onError(e: Throwable) {}
-        }
-
-        viewModel.observerTimer = object : DisposableObserver<String>() {
-            override fun onComplete() {
-                initPhoneAuth()
-                viewModel.disposableTimer?.let {
-                    it.dispose()
-                }
-            }
-
-            override fun onNext(t: String) {
-                init.signup_contentView_Type_A_sub_parent_input_phone_auth_timer_textView.text = t
-            }
-
-            override fun onError(e: Throwable) {
-
-            }
-        }
+        // 초기 회원가입에 대한 observer settings
+        setSignupObserver()
     }
 
     override fun onRemoveVIew(key: String) {
         when(key) {
             "signup" -> {
+                viewModel.compositeDisposable.clear()
 
+                // 회원가입에 대한 observer settings
+                setSignupObserver()
             }
         }
     }
 
     override fun onResume() {
         super.onResume()
-    }
-
-    private fun initPhoneAuth() {
-        init.apply {
-            signup_contentView_Type_A_sub_parent_input_editTextView_phone.isEnabled = true
-            signup_contentView_Type_A_sub__parent_input_button_phone.isClickable = true
-            signup_contentView_Type_A_sub__parent_input_button_phone.backgroundTintList = null
-
-            signup_contentView_Type_A_sub_parent_input_phone_auth_timer_textView.text = "남은 시간 0$auth_time:00"
-        }
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -222,4 +176,144 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
 
     }
 
+    /**
+     * 회원가입 화면에 대한 Observer settings
+     */
+    private fun setSignupObserver() {
+
+        // 회원가입 인증번호 요청 observer
+        viewModel.observerUpdateUI = object : Observer<Boolean> {
+            var status: Boolean = false
+            var dispose: Disposable? = null
+
+            override fun onSubscribe(d: Disposable) {
+                dispose = d
+            }
+
+            override fun onNext(t: Boolean) {
+                status = t
+            }
+            override fun onComplete() {
+                if(status) {
+                    init.apply {
+                        signup_contentView_Type_A_sub_parent_input_editTextView_phone.isEnabled = false
+                        signup_contentView_Type_A_sub__parent_input_button_phone.isClickable = false
+                        signup_contentView_Type_A_sub__parent_input_button_phone.backgroundTintList = ColorStateList.valueOf(
+                            Color.GRAY)
+                    }
+
+                    dispose?.let { it.apply {
+                        if(!isDisposed) dispose() }
+                    }
+                }
+                else {
+                    Snackbar.make(contentView!!,"휴대폰 번호를 다시 확인해 주세요", Snackbar.LENGTH_SHORT).show()
+                }
+            }
+            override fun onError(e: Throwable) {}
+        }
+
+        // 회원가입 인증 요청 타이머 observer
+        viewModel.observerTimer = object : Observer<String> {
+            var dispose: Disposable? = null
+
+            override fun onSubscribe(d: Disposable) {
+                dispose = d
+            }
+
+            override fun onComplete() {
+                init.apply {
+                    signup_contentView_Type_A_sub_parent_input_editTextView_phone.isEnabled = true
+                    signup_contentView_Type_A_sub__parent_input_button_phone.isClickable = true
+                    signup_contentView_Type_A_sub__parent_input_button_phone.backgroundTintList = null
+
+                    signup_contentView_Type_A_sub_parent_input_phone_auth_timer_textView.text = "남은 시간 0$auth_time:00"
+                }
+
+                dispose?.let { it.apply {
+                    if(!isDisposed) dispose() }
+                }
+            }
+
+            override fun onNext(t: String) {
+                init.signup_contentView_Type_A_sub_parent_input_phone_auth_timer_textView.text = t
+            }
+
+            override fun onError(e: Throwable) {
+
+            }
+        }
+
+        // 회원가입 인증번호 확인 observer
+        viewModel.observerSingUpPhoneAuthConfirm = object : Observer<Boolean> {
+            var status: Boolean = false
+            var disposable: Disposable? = null
+            override fun onComplete() {
+                if(status) {
+                    Snackbar.make(contentView!!,"인증번호 확인 성공", Snackbar.LENGTH_SHORT).show()
+                    init.apply {
+                        signup_contentView_Type_A_sub_parent_input_editTextView_phone_auth.isEnabled = false
+                        signup_contentView_Type_A_sub__parent_input_button_phone_auth.isClickable = false
+                        signup_contentView_Type_A_sub__parent_input_button_phone_auth.backgroundTintList = ColorStateList.valueOf(
+                            Color.GRAY)
+
+                        signup_contentView_Type_A_sub_parent_input_phone_auth_timer_textView.text = "남은 시간 0$auth_time:00"
+                    }
+
+                    viewModel.disposableTimer?.let { it.apply {
+                        if(!isDisposed) dispose() }
+                    }
+
+                    disposable?.let { it.apply {
+                        if(!isDisposed) dispose() }
+                    }
+                }
+                else {
+                    Snackbar.make(contentView!!,"인증번호를 다시 확인해 주세요", Snackbar.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onSubscribe(d: Disposable) {
+                disposable = d
+            }
+
+            override fun onNext(t: Boolean) {
+                status = t
+            }
+
+            override fun onError(e: Throwable) {
+
+            }
+        }
+
+        // 회원가입 약관 Item1 observer
+        viewModel.observerAgreementItem1 = object : Observer<Void> {
+            var disposable: Disposable? = null
+            override fun onComplete() {
+                Snackbar.make(contentView!!,"이용약관 보여주기", Snackbar.LENGTH_SHORT).show()
+            }
+
+            override fun onSubscribe(d: Disposable) {
+                disposable = d
+            }
+
+            override fun onNext(t: Void) {}
+            override fun onError(e: Throwable) {}
+        }
+
+        // 회원가입 약관 Item2 observer
+        viewModel.observerAgreementItem2 = object : Observer<Void> {
+            var disposable: Disposable? = null
+            override fun onComplete() {
+                Snackbar.make(contentView!!,"개인정보취급방침 보여주기", Snackbar.LENGTH_SHORT).show()
+            }
+
+            override fun onSubscribe(d: Disposable) {
+                disposable = d
+            }
+
+            override fun onNext(t: Void) {}
+            override fun onError(e: Throwable) {}
+        }
+    }
 }

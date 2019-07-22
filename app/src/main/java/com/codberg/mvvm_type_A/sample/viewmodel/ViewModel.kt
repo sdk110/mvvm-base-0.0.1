@@ -16,23 +16,28 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.observers.DisposableObserver
 import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.PublishSubject
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
 import java.util.concurrent.TimeUnit
 
 class ViewModel(private val model: networkServiece) : BaseKotlinViewModel(), AnkoLogger {
 
-    private val TAG = "ViewModel"
+    private val TAG = javaClass.simpleName
 
-    private val compositeDisposable = CompositeDisposable()
+    val compositeDisposable = CompositeDisposable()
 
     var disposableTimer: Disposable? = null
-    var observerTimer: DisposableObserver<String>? = null
+    var observerTimer: Observer<String>? = null
 
-    var observerUpdateUI: DisposableObserver<Boolean>? = null
-    var disposableUpdateUI: Disposable? = null
+    var observerUpdateUI: Observer<Boolean>? = null
 
-    val updateUI = MutableLiveData<Boolean>()
+    var observerSingUpPhoneAuthConfirm: Observer<Boolean>? = null
+
+    var observerAgreementItem1: Observer<Void>? = null
+    var observerAgreementItem2: Observer<Void>? = null
+
+    var observerPhoneAuthInitUI: Observer<Void>? = null
 
     companion object  { val POST = 0; val GET  = 1 }
 
@@ -130,31 +135,86 @@ class ViewModel(private val model: networkServiece) : BaseKotlinViewModel(), Ank
 
     }
 
-    fun phoneAuthInitUI() {
+    fun onSignUpShowAgreementItem1ButtonClick() {
+        Observable.create<Void>{it.onComplete()}
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe ({}, {},
+                { observerAgreementItem1!!.onComplete() }
+            )
+            .apply { compositeDisposable.add(this) }
+    }
+
+    fun onSignUpShowAgreementItem2ButtonClick() {
+        Observable.create<Void> { it.onComplete() }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe ({}, {},
+                { observerAgreementItem2!!.onComplete() }
+            )
+            .apply { compositeDisposable.add(this) }
+    }
+
+    fun onSignUpAgreementButtonClick(idEmail: String, password: String, name: String, phoneNumber: String, authNumber: String, agreement_all: Boolean) {
+        // todo -> 1. 모든 정보가 입력 되었는지 확인
+        // todo -> 2. 인증번호 확인이 안됐으면, 확인 요청 토스트 띄우기
+        // todo -> 3. 약관 동의 여부 확인
+        // todo -> 4. 메인 화면 or 로그인 화면 이동
+//        setDisposableTimer()
+//        phoneAuthInitUI()
+    }
+
+    /**
+     * 휴대폰 인증번호 확인에 따른 ui update 및 call request phone auth number api
+     */
+    fun onSignUpPhoneAuthConfirmButtonClick(phoneAuthNumber: String) {
+        // todo -> 휴대폰 인증 번호 확인 api
+
+        var status = !phoneAuthNumber.isNullOrBlank()
+
         Observable.create<Boolean>{
-            it.onNext(false)
+            it.onNext(status)
             it.onComplete()
         }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(observerUpdateUI!!)
+            .subscribe(
+                { observerSingUpPhoneAuthConfirm!!.onNext(it) },
+                { observerSingUpPhoneAuthConfirm!!.onError(it) },
+                { observerSingUpPhoneAuthConfirm!!.onComplete() }
+            )
+            .apply { compositeDisposable.add(this) }
     }
 
+    /**
+     * 휴대폰 인증번호 요청에 따른 update UI, run Timer, call request phone number api
+     */
     fun requestPhoneAuth(phoneNumber: String, auth_time: Int) {
+        var status = !phoneNumber.isNullOrBlank()
+
         // 요청 직후 UI 업데이트
         Observable.create<Boolean>{
-            it.onNext(true)
+            it.onNext(status)
             it.onComplete()
         }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(observerUpdateUI!!)
+            .subscribe(
+                { observerUpdateUI!!.onNext(it) },
+                { observerUpdateUI!!.onError(it)},
+                {
+                    observerUpdateUI!!.onComplete()
+                    if(status) startRequestPhoneTimer(auth_time)
+                }
+            )
+            .apply { compositeDisposable.add(this) }
 
         // todo -> 휴대폰 번호 인증 요청
-
-        startRequestPhoneTimer(auth_time)
     }
 
+    /**
+     * 휴대폰 인증번호 요청 시간 타이머
+     */
     private fun startRequestPhoneTimer(auth_time: Int) {
         var minit = auth_time - 1
         var second = 60
@@ -186,8 +246,6 @@ class ViewModel(private val model: networkServiece) : BaseKotlinViewModel(), Ank
                         it.onComplete()
                     }
                 }
-            )
+            ).apply { compositeDisposable.add(this) }
     }
-
-
 }
