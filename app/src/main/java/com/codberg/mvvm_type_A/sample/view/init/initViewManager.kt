@@ -27,7 +27,7 @@ import io.reactivex.observers.DisposableObserver
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk27.coroutines.onCheckedChange
 
-abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon : initActivity, rinit : init_data) : AnkoLogger {
+abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon : initActivity, rinit : init_view) : AnkoLogger {
 
     var con = rCon
     var util = rUtil
@@ -182,7 +182,7 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
         setSubParrent2_text1_LOGIN()
         setSubParrent2_text2_LOGIN()
         setSubParrent2_infoGroup_LOGIN()
-        setSubParrent2_infoGroup_contents_LOGIN()
+//        setSubParrent2_infoGroup_contents_LOGIN()
         setSubParrent2_infoGroupSpace_LOGIN()
         setAnimation_LOGIN()
 

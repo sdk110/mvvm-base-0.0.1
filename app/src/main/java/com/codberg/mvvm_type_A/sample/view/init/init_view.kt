@@ -4,12 +4,11 @@ import android.content.Context
 import android.graphics.Color
 import android.view.Gravity
 import android.view.View
-import android.view.ViewManager
 import android.widget.*
+import com.codberg.mvvm_type_A.sample.viewmodel.ViewModel
 import org.jetbrains.anko.*
-import org.jetbrains.anko.custom.ankoView
 
-open class init_view(mCon : Context) {
+class init_view(val viewModel: ViewModel): init_data() {
 
     /** [splash_TYPE_A] ----------------------------------------------**/
     lateinit var splash_contentVIew_Type_A : LinearLayout
@@ -82,9 +81,13 @@ open class init_view(mCon : Context) {
                         login_Type_A_sub_parent_2_signIn_group_login_naver      = textView  { gravity = Gravity.CENTER }
                     }.lparams(wrapContent, wrapContent)
                     login_Type_A_sub_parent_2_info_group = linearLayout {
-                        login_Type_A_sub_parent_2_info_group_sign_up = textView { gravity = Gravity.CENTER }
+                        login_Type_A_sub_parent_2_info_group_sign_up = textView {
+                            viewModel.setSignUpSettings()
+                        }
                         login_Type_A_sub_parent_2_info_group_space   = imageView{ }
-                        login_Type_A_sub_parent_2_info_group_find_pw = textView { gravity = Gravity.CENTER }
+                        login_Type_A_sub_parent_2_info_group_find_pw = textView {
+                            viewModel.setFindPwSettings()
+                        }
                     }.lparams(matchParent, wrapContent)
                     login_Type_A_sub_parent_2_text2 = textView { }
                 }

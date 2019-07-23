@@ -8,6 +8,7 @@ import com.codberg.mvvm_type_A.R
 import com.codberg.mvvm_type_A.sample.view.init.initActivity
 import com.codberg.mvvm_type_A.sample.view.init.initViewManager
 import com.codberg.mvvm_type_A.sample.view.init.init_data
+import com.codberg.mvvm_type_A.sample.view.init.init_view
 import com.codberg.mvvm_type_A.sample.viewmodel.ViewModel
 import com.google.android.material.snackbar.Snackbar
 import com.libs.cutil_kotlin.BasicUtil
@@ -21,7 +22,7 @@ import java.util.concurrent.TimeUnit
 
 class MainViewManager : initViewManager {
 
-    constructor(rUtil : ViewUtil?, rViewModel : ViewModel, rCon : initActivity, rinit : init_data) : super(rUtil, rViewModel, rCon, rinit)
+    constructor(rUtil : ViewUtil?, rViewModel : ViewModel, rCon : initActivity, rinit : init_view) : super(rUtil, rViewModel, rCon, rinit)
 
     /** [로그인화면] 로그인 버튼 클릭 시 호출 **/
     override fun onLoginClick_LoginScene(input_ID : String , input_PW : String , rUtil: ViewUtil?, rViewModel: ViewModel, rCon: initActivity) : Boolean {

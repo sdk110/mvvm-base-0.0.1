@@ -6,8 +6,9 @@ import android.graphics.Typeface
 import android.widget.HorizontalScrollView
 import com.codberg.mvvm_type_A.R
 import com.codberg.mvvm_type_A.sample.model.request.request_testApi
+import com.codberg.mvvm_type_A.sample.viewmodel.ViewModel
 
-data class init_data(var mCon : Context?) : init_view(mCon!!) {
+open class init_data {
 
     val DATA_NONE   = -2
     val CUSTOM   = -1

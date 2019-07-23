@@ -14,9 +14,7 @@ import io.reactivex.Observer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import io.reactivex.observers.DisposableObserver
 import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.PublishSubject
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.info
 import java.util.concurrent.TimeUnit
@@ -37,7 +35,8 @@ class ViewModel(private val model: networkServiece) : BaseKotlinViewModel(), Ank
     var observerAgreementItem1: Observer<Void>? = null
     var observerAgreementItem2: Observer<Void>? = null
 
-    var observerPhoneAuthInitUI: Observer<Void>? = null
+    var observerSignUpSettings: Observer<Void>? = null
+    var observerFindPwSettings: Observer<Void>? = null
 
     companion object  { val POST = 0; val GET  = 1 }
 
@@ -133,6 +132,26 @@ class ViewModel(private val model: networkServiece) : BaseKotlinViewModel(), Ank
 
         }
 
+    }
+
+    fun setSignUpSettings() {
+        Observable.create<Void>{it.onComplete()}
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe ({}, {},
+                { observerSignUpSettings!!.onComplete() }
+            )
+            .apply { compositeDisposable.add(this) }
+    }
+
+    fun setFindPwSettings() {
+        Observable.create<Void>{it.onComplete()}
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe ({}, {},
+                { observerFindPwSettings!!.onComplete() }
+            )
+            .apply { compositeDisposable.add(this) }
     }
 
     fun onSignUpShowAgreementItem1ButtonClick() {
