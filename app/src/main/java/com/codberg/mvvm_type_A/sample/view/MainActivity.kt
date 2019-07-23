@@ -8,11 +8,17 @@ import com.libs.cutil_kotlin.ViewUtil
 
 class MainActivity : initActivity()  {
 
-    override fun onRemove(): Int = 3
+    override fun onCustomBackPressed(): Int = 3
     override fun onBackground(): Boolean = true
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
     }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        viewModel.onBackPressed()
+    }
+
 
 }

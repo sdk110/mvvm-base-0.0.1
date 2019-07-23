@@ -6,7 +6,9 @@ import android.animation.ValueAnimator
 import android.animation.ValueAnimator.REVERSE
 import android.annotation.SuppressLint
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.text.InputFilter
+import android.text.InputType
 import android.view.Gravity
 import android.view.View
 import android.view.animation.AccelerateInterpolator
@@ -20,10 +22,12 @@ import com.libs.cutil_kotlin.ViewUtil
 import com.codberg.mvvm_type_A.sample.viewmodel.ViewModel
 import com.libs.cutil_kotlin.BasicUtil
 import com.libs.cutil_kotlin.ImageLoader
+import io.reactivex.disposables.Disposable
+import io.reactivex.observers.DisposableObserver
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk27.coroutines.onCheckedChange
 
-abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon : initActivity, rinit : init_data) : AnkoLogger {
+abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon : initActivity, rinit : init_view) : AnkoLogger {
 
     var con = rCon
     var util = rUtil
@@ -178,7 +182,7 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
         setSubParrent2_text1_LOGIN()
         setSubParrent2_text2_LOGIN()
         setSubParrent2_infoGroup_LOGIN()
-        setSubParrent2_infoGroup_contents_LOGIN()
+//        setSubParrent2_infoGroup_contents_LOGIN()
         setSubParrent2_infoGroupSpace_LOGIN()
         setAnimation_LOGIN()
 
@@ -480,7 +484,6 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
     }
 
     fun setSubParrent2_infoGroup_contents_LOGIN() {
-
         init.login_Type_A_sub_parent_2_info_group_sign_up.apply {
             textSize = init.login_sub_parent_2_info_group_signUP_textSize
             textColor = init.login_sub_parent_2_info_group_signUP_textColor
@@ -495,7 +498,7 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                     init.TYPE_A -> {
                         // todo -> draw view
                         con.getViewUtil()?.addView("signup", init.getSignUp(con), ViewUtil.ANIMATION_FADE_IN, ViewUtil.ANIMATION_FADE_OUT, object : ViewUtil.addViewInitListener {
-                            override fun setView(p0: View?) {
+                            override fun onCreateView(p0: View?) {
                                 // todo -> setting data
 
                                 var parent: LinearLayout = init.signup_contentView_Type_A
@@ -510,7 +513,7 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                                                 gravity = Gravity.CENTER_HORIZONTAL
                                                 orientation = LinearLayout.VERTICAL
                                                 isClickable = true
-                                        }
+                                            }
 
                                         if(signup_background != DATA_NONE)         backgroundResource = signup_background
                                         if(signup_backgroundColor != DATA_NONE)    backgroundColor = signup_backgroundColor
@@ -678,14 +681,6 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
 
     abstract  fun  onDraw_CUSTUM_VIEW_MAIN(rUtil : ViewUtil?, rViewModel : ViewModel, rCon : initActivity, rinit : init_data): View?
 
-    abstract  fun  onSignUpPhoneAuthButtonClick(rCon : initActivity)
-
-    abstract  fun  onSignUpShowAgreementItem1ButtonClick(rCon : initActivity)
-
-    abstract  fun  onSignUpShowAgreementItem2ButtonClick(rCon : initActivity)
-
-    abstract  fun  onSignUpAgreementButtonClick(rCon : initActivity)
-
     /** [로그인화면_END]---------------------------------------------------------------------------------------------------------------------------------------------------**/
 
 
@@ -744,7 +739,7 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                         .apply {
                             addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
 
-                            setImageResource(icon_idEmail_max_length)
+                            setImageResource(icon_idEmail_drawable_resource)
                         }
                 }
             }
@@ -821,7 +816,7 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                         .apply {
                             addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
 
-                            setImageResource(icon_idEmail_max_length)
+                            setImageResource(icon_password_drawable_resource)
                         }
                 }
             }
@@ -898,7 +893,7 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                         .apply {
                             addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
 
-                            setImageResource(icon_password_max_length)
+                            setImageResource(icon_password_drawable_resource)
                         }
                 }
             }
@@ -977,7 +972,7 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                         .apply {
                             addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
 
-                            setImageResource(icon_name_max_length)
+                            setImageResource(icon_name_drawable_resource)
                         }
                 }
             }
@@ -1056,7 +1051,7 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                         .apply {
                             addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
 
-                            setImageResource(icon_phone_max_length)
+                            setImageResource(icon_phone_drawable_resource)
                         }
                 }
             }
@@ -1076,9 +1071,10 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                             singleLine = true
                             filters = arrayOf(InputFilter.LengthFilter(editText_phone_max_length))
 
+                            inputType = InputType.TYPE_CLASS_NUMBER
+
                             addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
 
-//                            addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE)
                             addRule(RelativeLayout.RIGHT_OF, sub_parent_input_imageView_phone.id)
 
                             setMargins((width.toFloat() * signup_sub_parent_input_editTextView_marginLeft).toInt(),0,0, 0)
@@ -1099,6 +1095,7 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                 init.signup_contentView_Type_A_sub_parent_input_phone_auth.visibility = View.GONE
             }
 
+            // [인증번호 요청] 버튼
             sub_parent_input_button_phone.apply {
                 init.apply {
                     layoutParams = RelativeLayout.LayoutParams((width.toFloat() * passwordAuth_button_scaleX).toInt(), (height.toFloat() * passwordAuth_button_scaleY).toInt())
@@ -1108,7 +1105,7 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                             setMargins(0,0,0,(height.toFloat() * signup_sub_parent_input_view_marginBottom).toInt())
 
                             if(passwordAuth_button_background_resource != DATA_NONE) backgroundResource = passwordAuth_button_background_resource
-                            if(passwordAuth_button_background_color != DATA_NONE) backgroundColor = passwordAuth_button_background_color
+                            else if(passwordAuth_button_background_color != DATA_NONE) backgroundColor = passwordAuth_button_background_color
 
                             text = passwordAuth_button_text_value
                             textSize = passwordAuth_button_text_size
@@ -1116,7 +1113,7 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                         }
 
                     setOnClickListener {
-                        onSignUpPhoneAuthButtonClick(con)
+                        viewModel.requestPhoneAuth(sub_parent_input_editTextView_phone.text.toString(), auth_time)
                     }
                 }
             }
@@ -1150,6 +1147,7 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
         var sub_parent_input_imageView_phone_auth: ImageView = init.signup_contentView_Type_A_sub_parent_input_imageView_phone_auth
         var sub_parent_input_editTextView_phone_auth: EditText = init.signup_contentView_Type_A_sub_parent_input_editTextView_phone_auth
         var sub_parent_input_view_phone_auth: View = init.signup_contentView_Type_A_sub__parent_input_view_phone_auth
+        var sub_parent_input_button_phone_auth: Button = init.signup_contentView_Type_A_sub__parent_input_button_phone_auth
 
         // Sub Parent Input Layout Settings
         sub_parent_input_phone_auth.apply {
@@ -1168,7 +1166,7 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                         .apply {
                             addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
 
-                            setImageResource(icon_phoneAuth_max_length)
+                            setImageResource(icon_phoneAuth_drawable_resource)
                         }
                 }
             }
@@ -1188,6 +1186,8 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                             singleLine = true
                             filters = arrayOf(InputFilter.LengthFilter(editText_phoneAuth_max_length))
 
+                            inputType = InputType.TYPE_CLASS_NUMBER
+
                             addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
 
                             addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE)
@@ -1198,11 +1198,34 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                 }
             }
 
+            // [인증번호 확인] 버튼
+            sub_parent_input_button_phone_auth.apply {
+                init.apply {
+                    layoutParams = RelativeLayout.LayoutParams((width.toFloat() * passwordAuth_confirm_button_scaleX).toInt(), (height.toFloat() * passwordAuth_confirm_button_scaleY).toInt())
+                        .apply {
+                            addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE)
+                            addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
+                            setMargins(0,0,0,(height.toFloat() * signup_sub_parent_input_view_marginBottom).toInt())
+
+                            if(passwordAuth_confirm_button_background_resource != DATA_NONE) backgroundResource = passwordAuth_confirm_button_background_resource
+                            else if(passwordAuth_confirm_button_background_color != DATA_NONE) backgroundColor = passwordAuth_confirm_button_background_color
+
+                            text = passwordAuth_confirm_button_text_value
+                            textSize = passwordAuth_confirm_button_text_size
+                            textColor = passwordAuth_confirm_button_text_color
+                        }
+
+                    setOnClickListener {
+                        viewModel.onSignUpPhoneAuthConfirmButtonClick(sub_parent_input_editTextView_phone_auth.text.toString())
+                    }
+                }
+            }
+
             if(!init.use_under_bar) sub_parent_input_view_phone_auth.visibility = View.GONE
 
             sub_parent_input_view_phone_auth.apply {
                 init.apply {
-                    layoutParams = RelativeLayout.LayoutParams((width.toFloat() * signup_sub_parent_input_scaleX).toInt(), (height.toFloat() * under_bar_height).toInt())
+                    layoutParams = RelativeLayout.LayoutParams((width.toFloat() * signup_sub_parent_input_scaleX).toInt() - (width.toFloat() * init.passwordAuth_confirm_button_scaleX).toInt(), (height.toFloat() * under_bar_height).toInt())
                         .apply {
                             backgroundColor = under_bar_color
 
@@ -1210,6 +1233,27 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
 
                             setMargins(0,0,0,(height.toFloat() * signup_sub_parent_input_view_marginBottom).toInt())
                         }
+                }
+            }
+
+            setPhoneAuthTimer()
+        }
+    }
+
+    private fun setPhoneAuthTimer() {
+        var sub_parent_input_phone_auth_timer: RelativeLayout = init.signup_contentView_Type_A_sub_parent_input_phone_auth_timer_layout
+        var sub_parent_input_phone_auth_timer_textView: TextView = init.signup_contentView_Type_A_sub_parent_input_phone_auth_timer_textView
+
+        sub_parent_input_phone_auth_timer.apply {
+            init.apply {
+                layoutParams = LinearLayout.LayoutParams(wrapContent, wrapContent)
+            }
+
+            sub_parent_input_phone_auth_timer_textView.apply {
+                init.apply {
+                    text = "남은 시간 0$auth_time:00"
+                    textSize = 12f
+                    textColor = Color.RED
                 }
             }
         }
@@ -1276,15 +1320,6 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
 
                 onCheckedChange { buttonView, isChecked ->
                     isCheckedAll = isChecked
-
-//                    if(isChecked) {
-//                        init.signup_contentView_Type_A_sub_parent_agreement_item1_sub_checkBox.isChecked = true
-//                        init.signup_contentView_Type_A_sub_parent_agreement_item2_sub_checkBox.isChecked = true
-//                    }
-//                    else {
-//                        init.signup_contentView_Type_A_sub_parent_agreement_item1_sub_checkBox.isChecked = false
-//                        init.signup_contentView_Type_A_sub_parent_agreement_item2_sub_checkBox.isChecked = false
-//                    }
                 }
 
                 isClickable = false
@@ -1344,8 +1379,6 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                             gravity = Gravity.CENTER_VERTICAL
                         }
                     orientation = LinearLayout.HORIZONTAL
-
-//                    backgroundColor = Color.BLUE // 임시
                 }
 
                 sub_parent_agreement_item1_sub_checkBox.apply {
@@ -1400,7 +1433,7 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                 }
 
                 setOnClickListener {
-                    onSignUpShowAgreementItem1ButtonClick(con)
+                    viewModel.onSignUpShowAgreementItem1ButtonClick()
                 }
             }
         }
@@ -1480,8 +1513,6 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                 init.apply {
                     layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 
-//                    backgroundColor = Color.GRAY //  임시
-
                     text = agreement_checkBox_item2_show_text_value
                     textColor = agreement_checkBox_item2_show_text_color
                     textSize = agreement_checkBox_item2_show_text_size
@@ -1490,7 +1521,7 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                 }
 
                 setOnClickListener {
-                    onSignUpShowAgreementItem2ButtonClick(con)
+                    viewModel.onSignUpShowAgreementItem2ButtonClick()
                 }
             }
         }
@@ -1517,12 +1548,22 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                 gravity = Gravity.BOTTOM
             }
 
+            // [회원가입 완료] 버튼
             sub_parent_agreement_button.apply {
                 init.apply {
-                    if(signup_complete_button_background_resource != DATA_NONE) layoutParams = LinearLayout.LayoutParams((width.toFloat() * signup_complete_button_scaleX).toInt(), (height.toFloat() * signup_complete_button_scaleY).toInt())
-                    if(signup_complete_button_background_color != DATA_NONE) backgroundColor = signup_complete_button_background_color
+                    if(signup_complete_button_background_resource != DATA_NONE) {
+                        layoutParams = LinearLayout.LayoutParams((width.toFloat() * signup_complete_button_scaleX).toInt(), (height.toFloat() * signup_complete_button_scaleY).toInt())
+                            .apply {
+                                backgroundResource = signup_complete_button_background_resource
+                                setMargins(0,0,0, (height.toFloat() * signup_complete_button_marginBottom).toInt())
+                            }
 
-                    layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
+                    }
+                    else {
+                        layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
+                    }
+
+                    if(signup_complete_button_background_color != DATA_NONE) backgroundColor = signup_complete_button_background_color
 
                     text = signup_complete_button_text_value
                     textColor = signup_complete_button_text_color
@@ -1530,7 +1571,16 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                 }
 
                 setOnClickListener {
-                    onSignUpAgreementButtonClick(con)
+                    init.apply {
+                        viewModel.onSignUpAgreementButtonClick(
+                            idEmail = signup_contentView_Type_A_sub_parent_input_editTextView_id_email.text.toString(),
+                            password = signup_contentView_Type_A_sub_parent_input_editTextView_password.text.toString(),
+                            phoneNumber = signup_contentView_Type_A_sub_parent_input_editTextView_password_confirm.text.toString(),
+                            name = signup_contentView_Type_A_sub_parent_input_editTextView_name.text.toString(),
+                            authNumber = signup_contentView_Type_A_sub_parent_input_editTextView_phone.text.toString(),
+                            agreement_all = signup_contentView_Type_A_sub_parent_agreement_all_checkBox.isChecked
+                        )
+                    }
                 }
             }
         }

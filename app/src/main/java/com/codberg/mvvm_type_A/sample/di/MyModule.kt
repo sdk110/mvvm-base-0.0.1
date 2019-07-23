@@ -1,5 +1,6 @@
 package com.codberg.mvvm_type_A.sample.di
 
+import com.codberg.mvvm_type_A.sample.model.request.request_testApi
 import com.libs.cutil_kotlin.BuildConfig
 import com.libs.cutil_kotlin.GeneralPerposeRecyclerViewAdapter
 import com.codberg.mvvm_type_A.sample.model.service.networkServiece

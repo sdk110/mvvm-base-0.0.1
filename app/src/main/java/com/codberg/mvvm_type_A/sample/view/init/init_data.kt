@@ -5,8 +5,10 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.widget.HorizontalScrollView
 import com.codberg.mvvm_type_A.R
+import com.codberg.mvvm_type_A.sample.model.request.request_testApi
+import com.codberg.mvvm_type_A.sample.viewmodel.ViewModel
 
-data class init_data(var mCon : Context) : init_view(mCon) {
+open class init_data {
 
     val DATA_NONE   = -2
     val CUSTOM   = -1
@@ -250,7 +252,7 @@ data class init_data(var mCon : Context) : init_view(mCon) {
 
     // Parent Layout
     var signup_background = DATA_NONE
-    var signup_backgroundColor = Color.parseColor("#222222")
+    var signup_backgroundColor = Color.parseColor("#ffffff")
 
     // [Start] 회원가입 항목 틀 설정 ==========================================================================
     // Sub Parent
@@ -270,7 +272,7 @@ data class init_data(var mCon : Context) : init_view(mCon) {
     // 회원가입 최상단 제목
     var signup_title_text_value        = "Codberg 회원가입"
     var signup_title_text_size         = 25.0f // ex) 14.0f
-    var signup_title_text_color        = Color.parseColor("#ffffff")
+    var signup_title_text_color        = Color.parseColor("#2e2e2e")
     var signup_title_text_scaleX       = 1.0f  // ex) 0.3f
     var signup_title_text_scaleY       = 0.1f  // ex) 0.3f
     var signup_title_text_positionX    = 0.0f  // ex) 0.3f
@@ -282,10 +284,10 @@ data class init_data(var mCon : Context) : init_view(mCon) {
     var use_signup_id_email         = true     // 아이디 or 이메일
     var use_signup_password         = true     // 비밀번호 입력
     var use_signup_password_confirm = true     // 비밀번호 입력 확인
-    var use_signup_name             = false     // 이름 입력
-    var use_signup_phone            = false     // 휴대폰 번호 입력
-    var use_signup_phone_auth       = false     // 휴대폰 번호 인증
-    var use_signup_agreement        = false     // 약관
+    var use_signup_name             = true     // 이름 입력
+    var use_signup_phone            = true     // 휴대폰 번호 입력
+    var use_signup_phone_auth       = true     // 휴대폰 번호 인증
+    var use_signup_agreement        = true     // 약관
     // ==================================================================================
     //                      [End] 회원가입 항목 사용 유무
     // ==================================================================================
@@ -294,10 +296,10 @@ data class init_data(var mCon : Context) : init_view(mCon) {
     var use_under_bar               = true      // 언더바 사용 유무
     var under_bar_height            = 0.002f    // 언더바 두께
     var signup_sub_parent_input_view_marginBottom = 0.008f
-    var under_bar_color             = Color.parseColor("#aaaaaa")  // 언더바 색
+    var under_bar_color             = Color.parseColor("#2e2e2e")  // 언더바 색
 
     // 회원가입 항목들의 EditText Hint Color (공통)
-    var editText_hint_color         = Color.parseColor("#aaaaaa")
+    var editText_hint_color         = Color.parseColor("#902e2e2e")
 
     // 회원가입 항목들의 EditText Hint Text Value
     var editText_idEmail_hint_value             = "아이디(이메일)"
@@ -309,7 +311,7 @@ data class init_data(var mCon : Context) : init_view(mCon) {
 
 
     // 회원가입 항목들의 EditText Text Color (공통)
-    var editText_text_color         = Color.parseColor("#ffffff")
+    var editText_text_color         = Color.parseColor("#2e2e2e")
 
     // 회원가입 항목들의 EditText Max Length
     var editText_idEmail_max_length = 20
@@ -319,20 +321,31 @@ data class init_data(var mCon : Context) : init_view(mCon) {
     var editText_phoneAuth_max_length = 20
 
     // 회원가입 항목들의 Icon Image Resource
-    var icon_idEmail_max_length = R.mipmap.ic_launcher_round
-    var icon_password_max_length = R.mipmap.ic_launcher_round
-    var icon_name_max_length = R.mipmap.ic_launcher_round
-    var icon_phone_max_length = R.mipmap.ic_launcher_round
-    var icon_phoneAuth_max_length = R.mipmap.ic_launcher_round
+    var icon_idEmail_drawable_resource = R.drawable.icon_user
+    var icon_password_drawable_resource = R.drawable.icon_password
+    var icon_name_drawable_resource = R.mipmap.ic_launcher_round
+    var icon_phone_drawable_resource = R.drawable.icon_phone
+    var icon_phoneAuth_drawable_resource = R.drawable.icon_confirm
 
     // [휴대폰 인증 버튼]
     var passwordAuth_button_scaleX              = 0.2f // 0.3f
     var passwordAuth_button_scaleY              = 0.06f - 0.008f // 0.008f (언더바 마진 만큼 크기를 줄여서 center를 맞춘다.)
-    var passwordAuth_button_background_resource = DATA_NONE // R.drawable.xxxx
+    var passwordAuth_button_background_resource = R.drawable.round // R.drawable.xxxx
     var passwordAuth_button_background_color    = Color.parseColor("#ffffff")
     var passwordAuth_button_text_value          = "인증번호 요청"
     var passwordAuth_button_text_size           = 12f // sp
     var passwordAuth_button_text_color          = Color.parseColor("#222222")
+
+    // [휴대폰 인증 확인 버튼]
+    var passwordAuth_confirm_button_scaleX              = 0.2f // 0.3f
+    var passwordAuth_confirm_button_scaleY              = 0.06f - 0.008f // 0.008f (언더바 마진 만큼 크기를 줄여서 center를 맞춘다.)
+    var passwordAuth_confirm_button_background_resource = R.drawable.round // R.drawable.xxxx
+    var passwordAuth_confirm_button_background_color    = Color.parseColor("#ffffff")
+    var passwordAuth_confirm_button_text_value          = "인증번호 확인"
+    var passwordAuth_confirm_button_text_size           = 12f // sp
+    var passwordAuth_confirm_button_text_color          = Color.parseColor("#222222")
+
+    var auth_time = 3
 
     // [Start] 약관 ==================================================================================
     var agreement_checkBox_background_resource      = DATA_NONE
@@ -340,37 +353,38 @@ data class init_data(var mCon : Context) : init_view(mCon) {
     var agreement_checkBox_scaleY                   = 0.1f
 
     // 약관 [전체동의]
-    var agreement_checkBox_all_borderColor          = Color.parseColor("#ffffff")
+    var agreement_checkBox_all_borderColor          = Color.parseColor("#2e2e2e")
     var agreement_checkBox_all_text_value           = "전체동의"
-    var agreement_checkBox_all_text_color           = Color.parseColor("#ffffff")
+    var agreement_checkBox_all_text_color           = Color.parseColor("#2e2e2e")
     var agreement_checkBox_all_text_size            = 14f
 
     // 약관 [이용약관]
-    var agreement_checkBox_item1_borderColor          = Color.parseColor("#ffffff")
+    var agreement_checkBox_item1_borderColor          = Color.parseColor("#2e2e2e")
     var agreement_checkBox_item1_text_value           = "이용약관"
-    var agreement_checkBox_item1_text_color           = Color.parseColor("#ffffff")
+    var agreement_checkBox_item1_text_color           = Color.parseColor("#2e2e2e")
     var agreement_checkBox_item1_text_size            = 14f
     var agreement_checkBox_item1_show_text_value      = "[보기]"
-    var agreement_checkBox_item1_show_text_color      = Color.parseColor("#ffffff")
+    var agreement_checkBox_item1_show_text_color      = Color.parseColor("#2e2e2e")
     var agreement_checkBox_item1_show_text_size       = 14f
 
     // 약관 [개인정보취급방침]
-    var agreement_checkBox_item2_borderColor          = Color.parseColor("#ffffff")
+    var agreement_checkBox_item2_borderColor          = Color.parseColor("#2e2e2e")
     var agreement_checkBox_item2_text_value           = "개인정보취급방침"
-    var agreement_checkBox_item2_text_color           = Color.parseColor("#ffffff")
+    var agreement_checkBox_item2_text_color           = Color.parseColor("#2e2e2e")
     var agreement_checkBox_item2_text_size            = 14f
     var agreement_checkBox_item2_show_text_value      = "[보기]"
-    var agreement_checkBox_item2_show_text_color      = Color.parseColor("#ffffff")
+    var agreement_checkBox_item2_show_text_color      = Color.parseColor("#2e2e2e")
     var agreement_checkBox_item2_show_text_size       = 14f
     // [End] 약관 ==================================================================================
 
     // 회원가입 완료 버튼
-    var signup_complete_button_background_resource  = DATA_NONE
+    var signup_complete_button_background_resource  = R.drawable.round
     var signup_complete_button_background_color     = DATA_NONE
-    var signup_complete_button_scaleX               = 1.0f
-    var signup_complete_button_scaleY               = 1.0f
+    var signup_complete_button_scaleX               = 0.9f
+    var signup_complete_button_scaleY               = 0.07f
+    var signup_complete_button_marginBottom         = 0.03f
     var signup_complete_button_text_value           = "회원가입 완료"
-    var signup_complete_button_text_color           = Color.parseColor("#222222")
+    var signup_complete_button_text_color           = Color.parseColor("#2e2e2e")
     var signup_complete_button_text_size            = 14f
 
     /** [SignUp_End]  ------------------------------------------------------------------**/
@@ -381,5 +395,5 @@ data class init_data(var mCon : Context) : init_view(mCon) {
         var main_view_type = CUSTOM // main_type_A or CUSTOM
 
     /**------------------------------------------------------------------**/
-
+    var test = request_testApi::javaClass
 }

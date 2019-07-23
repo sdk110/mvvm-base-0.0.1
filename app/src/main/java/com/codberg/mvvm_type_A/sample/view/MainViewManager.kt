@@ -1,22 +1,28 @@
 package com.codberg.mvvm_type_A.sample.view
 
 import android.graphics.Color
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import com.codberg.mvvm_type_A.R
 import com.codberg.mvvm_type_A.sample.view.init.initActivity
 import com.codberg.mvvm_type_A.sample.view.init.initViewManager
 import com.codberg.mvvm_type_A.sample.view.init.init_data
+import com.codberg.mvvm_type_A.sample.view.init.init_view
 import com.codberg.mvvm_type_A.sample.viewmodel.ViewModel
 import com.google.android.material.snackbar.Snackbar
 import com.libs.cutil_kotlin.BasicUtil
 
 import com.libs.cutil_kotlin.ViewUtil
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import org.jetbrains.anko.*
+import java.util.concurrent.TimeUnit
 
 class MainViewManager : initViewManager {
 
-    constructor(rUtil : ViewUtil?, rViewModel : ViewModel, rCon : initActivity, rinit : init_data) : super(rUtil, rViewModel, rCon, rinit)
+    constructor(rUtil : ViewUtil?, rViewModel : ViewModel, rCon : initActivity, rinit : init_view) : super(rUtil, rViewModel, rCon, rinit)
 
     /** [로그인화면] 로그인 버튼 클릭 시 호출 **/
     override fun onLoginClick_LoginScene(input_ID : String , input_PW : String , rUtil: ViewUtil?, rViewModel: ViewModel, rCon: initActivity) : Boolean {
@@ -112,33 +118,4 @@ class MainViewManager : initViewManager {
             }
         }.view
     }
-
-    /**
-     * 회원가입 휴대폰 인증 번호 요청 버튼에 대한 click listener
-     */
-    override fun onSignUpPhoneAuthButtonClick(rCon: initActivity) {
-        Snackbar.make(rCon.contentView!!,"인증번호 요청 클릭",Snackbar.LENGTH_SHORT).show()
-    }
-
-    /**
-     * 회원가입 약관 Item1의 상세 보기 이동
-     */
-    override fun onSignUpShowAgreementItem1ButtonClick(rCon: initActivity) {
-        Snackbar.make(rCon.contentView!!,"이용약관 이동",Snackbar.LENGTH_SHORT).show()
-    }
-
-    /**
-     * 회원가입 약관 Item2의 상세 보기 이동
-     */
-    override fun onSignUpShowAgreementItem2ButtonClick(rCon: initActivity) {
-        Snackbar.make(rCon.contentView!!,"개인정보취급방침 이동",Snackbar.LENGTH_SHORT).show()
-    }
-
-    /**
-     * 회원가입 완료 버튼
-     */
-    override fun onSignUpAgreementButtonClick(rCon: initActivity) {
-        Snackbar.make(rCon.contentView!!,"회원가입 완료",Snackbar.LENGTH_SHORT).show()
-    }
-
 }
