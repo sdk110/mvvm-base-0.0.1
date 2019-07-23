@@ -12,15 +12,21 @@ import android.text.InputFilter
 import android.text.InputType
 import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
 import androidx.interpolator.view.animation.FastOutLinearInInterpolator
+import androidx.recyclerview.widget.RecyclerView
+import com.codberg.mvvm_type_A.R
 import com.libs.cutil_kotlin.BaseKotlinActivity
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import com.codberg.mvvm_type_A.sample.viewmodel.ViewModel
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 import com.libs.cutil_kotlin.BasicUtil
+import com.libs.cutil_kotlin.GeneralPerposeRecyclerViewAdapter
 import com.libs.cutil_kotlin.ViewUtil
 import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
@@ -36,6 +42,7 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
     var devHeight: Int = 0
 
     val mContext: Context = this
+    lateinit var mMainPagerAdapter : GeneralPerposeRecyclerViewAdapter
 
     override val viewModel: ViewModel by viewModel()
 
@@ -1305,5 +1312,76 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
             override fun onNext(t: Void) {}
             override fun onError(e: Throwable) {}
         }
+
+        //메인 VIewpager
+        viewModel.observerMainScenes = object : Observer<Boolean> {
+            var status: Boolean = false
+            var dispose: Disposable? = null
+
+            override fun onSubscribe(d: Disposable) {
+                dispose = d
+            }
+
+            override fun onNext(t: Boolean) {
+                status = t
+            }
+            override fun onComplete() {
+
+                //set onCreateListener
+                var onCreateListener_model_A : GeneralPerposeRecyclerViewAdapter.createViewListener = object : GeneralPerposeRecyclerViewAdapter.createViewListener  {
+
+                    override fun onCreate(ui: AnkoContext<ViewGroup>): View = init.getViewpager_Item_1_MAIN(baseContext)
+                }
+
+                //set onBindListener
+                var onBindListener_model_A : GeneralPerposeRecyclerViewAdapter.bindListener = object : GeneralPerposeRecyclerViewAdapter.bindListener {
+
+                    override fun onBind(holder: RecyclerView.ViewHolder, position: Int, data : Any, baseContext : Context) {
+
+                        holder.itemView.findViewById<TextView>(R.id.viewPager_item_text).text = data.toString()
+                        holder.itemView.run {
+                            setOnClickListener {baseContext.toast("position : $position")}
+                        }
+                    }
+
+                }
+
+                val eventList = ArrayList<Any>()
+                eventList.add("PAGE : 1")
+                eventList.add("PAGE : 2")
+                eventList.add("PAGE : 3")
+                eventList.add("PAGE : 4")
+                eventList.add("PAGE : 5")
+                eventList.add("PAGE : 6")
+                eventList.add("PAGE : 7")
+                eventList.add("PAGE : 7")
+
+                mMainPagerAdapter = GeneralPerposeRecyclerViewAdapter(baseContext)
+                mMainPagerAdapter!!.setOnCreateViewListener(onCreateListener_model_A)
+                mMainPagerAdapter!!.setOnBindListener(onBindListener_model_A)
+                mMainPagerAdapter.setDataList(eventList)
+
+                init.main_viewPager.apply {
+                    layoutParams =  FrameLayout.LayoutParams((devWidth.toFloat() * 1.0f).toInt(), (devHeight.toFloat() * 0.9f).toInt() )
+                    translationX = (devWidth.toFloat() * 0.0f)
+                    translationY = (devHeight.toFloat() * 0.1f)
+                    adapter = mMainPagerAdapter
+                }
+
+                init.main_tabLayout.apply {
+                    layoutParams =  FrameLayout.LayoutParams((devWidth.toFloat() * 1.0f).toInt(), (devHeight.toFloat() * 0.1f).toInt() )
+                    translationX = (devWidth.toFloat() * 0.0f)
+                    translationY = (devHeight.toFloat() * 0.0f)
+                    tabMode = TabLayout.MODE_SCROLLABLE
+                }
+
+                TabLayoutMediator(init.main_tabLayout, init.main_viewPager) { tab, position ->
+                    tab.text = position.toString()
+                }.attach()
+
+            }
+            override fun onError(e: Throwable) {}
+        }
+
     }
 }

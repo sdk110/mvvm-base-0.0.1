@@ -4,9 +4,15 @@ import android.content.Context
 import android.graphics.Color
 import android.view.Gravity
 import android.view.View
+import android.view.ViewManager
 import android.widget.*
+import androidx.viewpager2.widget.ViewPager2
+import com.codberg.mvvm_type_A.R
 import com.codberg.mvvm_type_A.sample.viewmodel.ViewModel
+import com.google.android.material.tabs.TabLayout
+import com.libs.cutil_kotlin.ScalingImageView
 import org.jetbrains.anko.*
+import org.jetbrains.anko.custom.ankoView
 
 class init_view(val viewModel: ViewModel): init_data() {
 
@@ -265,10 +271,35 @@ class init_view(val viewModel: ViewModel): init_data() {
     /**----------------------------------------------------------------**/
 
     /** [main] ----------------------------------------------**/
+    lateinit var main_parrent : FrameLayout
+    lateinit var main_viewPager : ViewPager2
+    lateinit var main_tabLayout : TabLayout
+    inline fun ViewManager.ScalingImageView(theme: Int = 0, init: ScalingImageView.() -> Unit) = ankoView({ ScalingImageView(it) }, theme, init)
+    inline fun ViewManager.ViewPager2(theme: Int = 0, init: ViewPager2.() -> Unit) = ankoView({ ViewPager2(it) }, theme, init)
+    inline fun ViewManager.TabLayout(theme: Int = R.style.AppTheme, init: TabLayout.() -> Unit) = ankoView({ TabLayout(it) }, theme, init)
+
     fun getMain_TYPE_A(mCon:Context) : View {
         return mCon.UI {
-            verticalLayout {
-                backgroundColor = Color.parseColor("#ffffff")
+            main_parrent = frameLayout {
+                main_viewPager = ViewPager2 {
+                    orientation = ViewPager2.ORIENTATION_VERTICAL
+                }
+                main_tabLayout = TabLayout {
+
+                }.lparams(matchParent, 100)
+            }
+        }.view
+    }
+
+
+    fun getViewpager_Item_1_MAIN(mCon:Context) : View {
+        return mCon.UI {
+            frameLayout {
+                lparams(matchParent,matchParent)
+                textView {
+                    id = R.id.viewPager_item_text
+                }.lparams(matchParent, matchParent)
+
             }
         }.view
     }
