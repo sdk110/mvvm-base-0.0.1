@@ -37,6 +37,7 @@ class ViewModel(private val model: networkServiece) : BaseKotlinViewModel(), Ank
 
     var observerSignUpSettings: Observer<Void>? = null
     var observerFindPwSettings: Observer<Void>? = null
+    var observerMainScenes: Observer<Boolean>? = null
 
     companion object  { val POST = 0; val GET  = 1 }
 
@@ -266,5 +267,23 @@ class ViewModel(private val model: networkServiece) : BaseKotlinViewModel(), Ank
                     }
                 }
             ).apply { compositeDisposable.add(this) }
+    }
+    
+    //메인화면 뷰페이저
+    fun requestSetMain() {
+
+        Observable.create<Boolean>{
+            it.onNext(true)
+            it.onComplete()
+        }
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(
+            { observerMainScenes!!.onNext(it)  },
+            { observerMainScenes!!.onError(it) },
+            { observerMainScenes!!.onComplete() }
+        )
+        .apply { compositeDisposable.add(this) }
+
     }
 }
