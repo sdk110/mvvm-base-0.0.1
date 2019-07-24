@@ -6,4 +6,5 @@
     <item name="main_activity_search_recycler_view" type="id"/>
     <item name="test_item_img"      type="id"/>
     <item name="test_item_text"     type="id"/>
+    <item name="viewPager_item_text"     type="id"/>
 </resources>
