@@ -389,6 +389,55 @@ open class init_data {
 
     /** [SignUp_End]  ------------------------------------------------------------------**/
 
+    /** [Find Id and Password] ------------------------------------------------------------ **/
+    // Sign Up Layout Type
+    var find_IdPw_view_type = TYPE_A // TYPE-A, customView
+    var find_IdPw_anmation_type = CUSTOM // TYPE-A, customView
+
+    // Parent Layout
+    var find_IdPw_background = DATA_NONE
+    var find_IdPw_backgroundColor = Color.parseColor("#ffffff")
+
+    // 회원가입 최상단 제목
+    var find_IdPw_title_text_value        = "아이디 / 비밀번호 찾기"
+    var find_IdPw_title_text_size         = 25.0f // ex) 14.0f
+    var find_IdPw_title_text_color        = Color.parseColor("#2e2e2e")
+    var find_IdPw_title_text_scaleX       = 1.0f  // ex) 0.3f
+    var find_IdPw_title_text_scaleY       = 0.1f  // ex) 0.3f
+    var find_IdPw_title_text_positionX    = 0.0f  // ex) 0.3f
+    var find_IdPw_title_text_positionY    = 0.0f  // ex) 0.3f
+
+    // Sub Parent Layout
+    var find_IdPw_sub_parent_background = DATA_NONE
+    var find_IdPw_sub_parent_backgroundColor = Color.parseColor("#ffffff")
+
+    // Sub Parent Layout Tab Layout
+    var find_IdPw_sub_parent_selected_color = Color.parseColor("#2e2e2e")
+    var find_IdPw_sub_parent_unselected_color = Color.parseColor("#902e2e2e")
+    var find_IdPw_sub_parent_indicator_color = Color.parseColor("#2e2e2e")
+
+    // 아이디 찾기 버튼
+    var find_Id_complete_button_background_resource  = R.drawable.round
+    var find_Id_complete_button_background_color     = DATA_NONE
+    var find_Id_complete_button_scaleX               = 0.9f
+    var find_Id_complete_button_scaleY               = 0.07f
+    var find_Id_complete_button_marginBottom         = 0.03f
+    var find_Id_complete_button_text_value           = "아이디 찾기"
+    var find_Id_complete_button_text_color           = Color.parseColor("#2e2e2e")
+    var find_Id_complete_button_text_size            = 14f
+
+    // 비밀번호 찾기 버튼
+    var find_Pw_complete_button_background_resource  = R.drawable.round
+    var find_Pw_complete_button_background_color     = DATA_NONE
+    var find_Pw_complete_button_scaleX               = 0.9f
+    var find_Pw_complete_button_scaleY               = 0.07f
+    var find_Pw_complete_button_marginBottom         = 0.03f
+    var find_Pw_complete_button_text_value           = "비밀번호 찾기"
+    var find_Pw_complete_button_text_color           = Color.parseColor("#2e2e2e")
+    var find_Pw_complete_button_text_size            = 14f
+
+    /** ----------------------------------------------------------------------------------- **/
+
     /** [mainView] ------------------------------------------------------**/
 
         //타입

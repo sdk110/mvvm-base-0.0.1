@@ -36,7 +36,7 @@ class ViewModel(private val model: networkServiece) : BaseKotlinViewModel(), Ank
     var observerAgreementItem2: Observer<Void>? = null
 
     var observerSignUpSettings: Observer<Void>? = null
-    var observerFindPwSettings: Observer<Void>? = null
+    var observerFindIdPwSettings: Observer<Void>? = null
     var observerMainScenes: Observer<Boolean>? = null
 
     companion object  { val POST = 0; val GET  = 1 }
@@ -145,12 +145,12 @@ class ViewModel(private val model: networkServiece) : BaseKotlinViewModel(), Ank
             .apply { compositeDisposable.add(this) }
     }
 
-    fun setFindPwSettings() {
+    fun setFindIdPwSettings() {
         Observable.create<Void>{it.onComplete()}
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe ({}, {},
-                { observerFindPwSettings!!.onComplete() }
+                { observerFindIdPwSettings!!.onComplete() }
             )
             .apply { compositeDisposable.add(this) }
     }
