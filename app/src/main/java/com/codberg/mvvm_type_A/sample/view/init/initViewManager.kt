@@ -1113,7 +1113,7 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                         }
 
                     setOnClickListener {
-                        viewModel.requestPhoneAuth(sub_parent_input_editTextView_phone.text.toString(), auth_time)
+                        viewModel.requestPhoneAuth(sub_parent_input_editTextView_phone.text.toString(), auth_time, 0)
                     }
                 }
             }
@@ -1216,7 +1216,7 @@ abstract class initViewManager(rUtil : ViewUtil?, rViewModel : ViewModel, rCon :
                         }
 
                     setOnClickListener {
-                        viewModel.onSignUpPhoneAuthConfirmButtonClick(sub_parent_input_editTextView_phone_auth.text.toString())
+                        viewModel.onSignUpPhoneAuthConfirmButtonClick(sub_parent_input_editTextView_phone_auth.text.toString(), 0)
                     }
                 }
             }

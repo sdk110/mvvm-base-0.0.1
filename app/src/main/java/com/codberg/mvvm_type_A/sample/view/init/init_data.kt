@@ -1,12 +1,9 @@
 package com.codberg.mvvm_type_A.sample.view.init
 
-import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
-import android.widget.HorizontalScrollView
 import com.codberg.mvvm_type_A.R
 import com.codberg.mvvm_type_A.sample.model.request.request_testApi
-import com.codberg.mvvm_type_A.sample.viewmodel.ViewModel
 
 open class init_data {
 
@@ -389,54 +386,266 @@ open class init_data {
 
     /** [SignUp_End]  ------------------------------------------------------------------**/
 
-    /** [Find Id and Password] ------------------------------------------------------------ **/
-    // Sign Up Layout Type
-    var find_IdPw_view_type = TYPE_A // TYPE-A, customView
-    var find_IdPw_anmation_type = CUSTOM // TYPE-A, customView
 
-    // Parent Layout
-    var find_IdPw_background = DATA_NONE
-    var find_IdPw_backgroundColor = Color.parseColor("#ffffff")
 
-    // 회원가입 최상단 제목
-    var find_IdPw_title_text_value        = "아이디 / 비밀번호 찾기"
-    var find_IdPw_title_text_size         = 25.0f // ex) 14.0f
-    var find_IdPw_title_text_color        = Color.parseColor("#2e2e2e")
-    var find_IdPw_title_text_scaleX       = 1.0f  // ex) 0.3f
-    var find_IdPw_title_text_scaleY       = 0.1f  // ex) 0.3f
-    var find_IdPw_title_text_positionX    = 0.0f  // ex) 0.3f
-    var find_IdPw_title_text_positionY    = 0.0f  // ex) 0.3f
 
-    // Sub Parent Layout
-    var find_IdPw_sub_parent_background = DATA_NONE
-    var find_IdPw_sub_parent_backgroundColor = Color.parseColor("#ffffff")
 
-    // Sub Parent Layout Tab Layout
-    var find_IdPw_sub_parent_selected_color = Color.parseColor("#2e2e2e")
-    var find_IdPw_sub_parent_unselected_color = Color.parseColor("#902e2e2e")
-    var find_IdPw_sub_parent_indicator_color = Color.parseColor("#2e2e2e")
+    /** [Start][아이디/비밀번호 찾기] ------------------------------------------------------------ **/
 
-    // 아이디 찾기 버튼
-    var find_Id_complete_button_background_resource  = R.drawable.round
-    var find_Id_complete_button_background_color     = DATA_NONE
-    var find_Id_complete_button_scaleX               = 0.9f
-    var find_Id_complete_button_scaleY               = 0.07f
-    var find_Id_complete_button_marginBottom         = 0.03f
-    var find_Id_complete_button_text_value           = "아이디 찾기"
-    var find_Id_complete_button_text_color           = Color.parseColor("#2e2e2e")
-    var find_Id_complete_button_text_size            = 14f
+    // FIND ID/PW - Main Parent Background
+    var find_id_pw_background = DATA_NONE
+    var find_id_pw_backgroundColor = Color.parseColor("#ffffff")
 
-    // 비밀번호 찾기 버튼
-    var find_Pw_complete_button_background_resource  = R.drawable.round
-    var find_Pw_complete_button_background_color     = DATA_NONE
-    var find_Pw_complete_button_scaleX               = 0.9f
-    var find_Pw_complete_button_scaleY               = 0.07f
-    var find_Pw_complete_button_marginBottom         = 0.03f
-    var find_Pw_complete_button_text_value           = "비밀번호 찾기"
-    var find_Pw_complete_button_text_color           = Color.parseColor("#2e2e2e")
-    var find_Pw_complete_button_text_size            = 14f
+    // FIND ID/PW - Sub Parent Background
+    var find_id_pw_sub_parent_background = DATA_NONE
+    var find_id_pw_sub_parent_backgroundColor = Color.parseColor("#ffffff")
 
-    /** ----------------------------------------------------------------------------------- **/
+    // FIND ID/PW - Sub Parent Tab Layout
+    var find_id_pw_sub_parent_selected_color = Color.parseColor("#2e2e2e")
+    var find_id_pw_sub_parent_unselected_color = Color.parseColor("#902e2e2e")
+    var find_id_pw_sub_parent_indicator_color = Color.parseColor("#2e2e2e")
+
+    // FIND ID/PW - 최상단 제목
+    var find_id_pw_title_text_value        = "아이디 / 비밀번호 찾기"
+    var find_id_pw_title_text_size         = 25.0f // ex) 14.0f
+    var find_id_pw_title_text_color        = Color.parseColor("#2e2e2e")
+    var find_id_pw_title_text_scaleX       = 1.0f  // ex) 0.3f
+    var find_id_pw_title_text_scaleY       = 0.1f  // ex) 0.3f
+    var find_id_pw_title_text_positionX    = 0.0f  // ex) 0.3f
+    var find_id_pw_title_text_positionY    = 0.0f  // ex) 0.3f
+
+
+
+    // ==============================================================================================
+    // [start] 아이디 찾기 Type A =====================================================================
+    // ==============================================================================================
+    // FIND ID - UI Type
+    var find_id_view_type = TYPE_A // TYPE-A, customView
+
+    // FIND ID - 맨 처음 Top Margin(높이) 값
+    var find_id_main_parent_layout_margin_top = 0.1f
+
+    // FIND ID - Layout Size By Item (All) / 휴대폰, 인증번호 등의 공통 속성
+    var find_id_sub_parent_input_phone_layout_scaleX = 0.9f
+    var find_id_sub_parent_input_phone_layout_scaleY = 0.08f
+
+
+
+    // ======================================== [Phone] ========================================
+    // FIND ID - Phone (ImageView Attribute)
+    var find_id_phone_imageview_icon_scaleX = 0.08f
+    var find_id_phone_imageview_icon_scaleY = 0.08f
+    var find_id_phone_imageview_icon_resource = R.drawable.icon_phone  // Phone Icon Resource
+
+    // FIND ID - Phone (EditText Attribute)
+    var find_id_phone_edittext_scaleX = find_id_sub_parent_input_phone_layout_scaleX - find_id_sub_parent_input_phone_layout_scaleY
+    var find_id_phone_edittext_scaleY = 0.08f
+    var find_id_phone_edittext_marginLeft = 0.1f                                    // icon과 EditText 사이 간격
+    var find_id_phone_edittext_max_length = 20                                      // EditText Max Length
+    var find_id_phone_edittext_text_color = Color.parseColor("#2e2e2e")   // EditText Text Color
+    var find_id_phone_edittext_hint_value = "휴대폰 번호"                              // EditText Hint Value
+    var find_id_phone_edittext_hint_color = Color.parseColor("#902e2e2e") // EditText Hint Color
+
+    // FIND ID - Phone (Request Auth Number Button Attribute)
+    var find_id_request_auth_button_scaleX              = 0.2f // 0.3f
+    var find_id_request_auth_button_scaleY              = 0.06f - 0.008f // 0.008f (언더바 마진 만큼 크기를 줄여서 center를 맞춘다.)
+    var find_id_request_auth_button_marginBottom        = 0.008f
+    var find_id_request_auth_button_background_resource = R.drawable.round // R.drawable.xxxx
+    var find_id_request_auth_button_background_color    = Color.parseColor("#ffffff")
+    var find_id_request_auth_button_text_value          = "인증번호 요청"
+    var find_id_request_auth_button_text_size           = 12f // sp
+    var find_id_request_auth_button_text_color          = Color.parseColor("#222222")
+
+    // FIND ID - Phone (UnderBar Attribute)
+    var find_id_phone_use_under_bar                 = true      // 언더바 사용 유무
+    var find_id_phone_under_bar_height              = 0.002f    // 언더바 두께
+    var find_id_phone_under_bar_marginBottom        = 0.008f
+    var find_id_phone_under_bar_under_bar_color     = Color.parseColor("#2e2e2e")  // 언더바 색
+    // ========================================================================================
+
+
+
+    // ======================================== [Phone Auth] ========================================
+    // FIND ID - Phone Auth (ImageView Attribute)
+    var find_id_phone_auth_imageview_icon_scaleX = 0.08f
+    var find_id_phone_auth_imageview_icon_scaleY = 0.08f
+    var find_id_phone_auth_imageview_icon_resource = R.drawable.icon_confirm  // Phone Icon Resource
+
+    // FIND ID - Phone Auth (EditText Attribute)
+    var find_id_phone_auth_edittext_scaleX = find_id_sub_parent_input_phone_layout_scaleX - find_id_sub_parent_input_phone_layout_scaleY
+    var find_id_phone_auth_edittext_scaleY = 0.08f
+    var find_id_phone_auth_edittext_marginLeft = 0.1f                                    // icon과 EditText 사이 간격
+    var find_id_phone_auth_edittext_max_length = 20                                      // EditText Max Length
+    var find_id_phone_auth_edittext_text_color = Color.parseColor("#2e2e2e")   // EditText Text Color
+    var find_id_phone_auth_edittext_hint_value = "인증번호 입력"                              // EditText Hint Value
+    var find_id_phone_auth_edittext_hint_color = Color.parseColor("#902e2e2e") // EditText Hint Color
+
+    // FIND ID - Phone Auth (Confirm Auth Number Button Attribute)
+    var find_id_phone_auth_confirm_auth_button_scaleX              = 0.2f // 0.3f
+    var find_id_phone_auth_confirm_auth_button_scaleY              = 0.06f - 0.008f // 0.008f (언더바 마진 만큼 크기를 줄여서 center를 맞춘다.)
+    var find_id_phone_auth_confirm_auth_button_marginBottom        = 0.008f
+    var find_id_phone_auth_confirm_auth_button_background_resource = R.drawable.round // R.drawable.xxxx
+    var find_id_phone_auth_confirm_auth_button_background_color    = Color.parseColor("#ffffff")
+    var find_id_phone_auth_confirm_auth_button_text_value          = "인증번호 확인"
+    var find_id_phone_auth_confirm_auth_button_text_size           = 12f // sp
+    var find_id_phone_auth_confirm_auth_button_text_color          = Color.parseColor("#222222")
+
+    // FIND ID - Phone Auth (UnderBar Attribute)
+    var find_id_phone_auth_use_under_bar = true      // 언더바 사용 유무
+    var find_id_phone_auth_under_bar_height = 0.002f    // 언더바 두께
+    var find_id_phone_auth_under_bar_marginBottom = 0.008f
+    var find_id_phone_auth_under_bar_under_bar_color = Color.parseColor("#2e2e2e")  // 언더바 색
+    // ========================================================================================
+
+
+
+    // ======================================== [Find Id Button] ========================================
+    // FIND ID - Main Find ID Button Attribute
+    var find_id_find_button_background_resource  = R.drawable.round
+    var find_id_find_button_background_color     = DATA_NONE
+    var find_id_find_button_scaleX               = 0.9f
+    var find_id_find_button_scaleY               = 0.07f
+    var find_id_find_button_margin_top           = 0.1f
+    var find_id_find_button_marginBottom         = 0.03f
+    var find_id_find_button_text_value           = "아이디 찾기"
+    var find_id_find_button_text_color           = Color.parseColor("#2e2e2e")
+    var find_id_find_button_text_size            = 14f
+    // ==============================================================================================
+    // [end] 아이디 찾기 Type A =====================================================================
+    // ==============================================================================================
+
+
+
+
+    // ==============================================================================================
+    // [start] 비밀번호 찾기 Type A =====================================================================
+    // ==============================================================================================
+    // FIND PW - UI Type
+    var find_pw_view_type = TYPE_A
+
+    // FIND PW - 맨 처음 Top Margin(높이) 값
+    var find_pw_main_parent_layout_margin_top = 0.1f
+
+    // FIND PW - Layout Size By Item (All) / 휴대폰, 인증번호 등의 공통 속성
+    var find_pw_sub_parent_input_phone_layout_scaleX = 0.9f
+    var find_pw_sub_parent_input_phone_layout_scaleY = 0.08f
+
+
+
+    // ======================================== [Id/Email] ========================================
+    // FIND PW - Id/Email (ImageView Attribute)
+    var find_pw_IdEmail_imageview_icon_scaleX = 0.08f
+    var find_pw_IdEmail_imageview_icon_scaleY = 0.08f
+    var find_pw_IdEmail_imageview_icon_resource = R.drawable.icon_user  // Phone Icon Resource
+
+    // FIND PW - Id/Email (EditText Attribute)
+    var find_pw_IdEmail_edittext_scaleX = 0.9f
+    var find_pw_IdEmail_edittext_scaleY = 0.08f
+    var find_pw_IdEmail_edittext_marginLeft = 0.1f                                    // icon과 EditText 사이 간격
+    var find_pw_IdEmail_edittext_max_length = 20                                      // EditText Max Length
+    var find_pw_IdEmail_edittext_text_color = Color.parseColor("#2e2e2e")   // EditText Text Color
+    var find_pw_IdEmail_edittext_hint_value = "아이디 or 이메일"                              // EditText Hint Value
+    var find_pw_IdEmail_edittext_hint_color = Color.parseColor("#902e2e2e") // EditText Hint Color
+
+    // FIND PW - Id/Email (UnderBar Attribute)
+    var find_pw_IdEmail_use_under_bar                 = true      // 언더바 사용 유무
+    var find_pw_IdEmail_under_bar_height              = 0.002f    // 언더바 두께
+    var find_pw_IdEmail_under_bar_marginBottom        = 0.008f
+    var find_pw_IdEmail_under_bar_under_bar_color     = Color.parseColor("#2e2e2e")  // 언더바 색
+    // ============================================================================================
+
+
+
+    // ======================================== [Phone] ========================================
+    // FIND PW - Phone (ImageView Attribute)
+    var find_pw_phone_imageview_icon_scaleX = 0.08f
+    var find_pw_phone_imageview_icon_scaleY = 0.08f
+    var find_pw_phone_imageview_icon_resource = R.drawable.icon_phone  // Phone Icon Resource
+
+    // FIND PW - Phone (EditText Attribute)
+    var find_pw_phone_edittext_scaleX = find_id_sub_parent_input_phone_layout_scaleX - find_id_sub_parent_input_phone_layout_scaleY
+    var find_pw_phone_edittext_scaleY = 0.08f
+    var find_pw_phone_edittext_marginLeft = 0.1f                                    // icon과 EditText 사이 간격
+    var find_pw_phone_edittext_max_length = 20                                      // EditText Max Length
+    var find_pw_phone_edittext_text_color = Color.parseColor("#2e2e2e")   // EditText Text Color
+    var find_pw_phone_edittext_hint_value = "휴대폰 번호"                              // EditText Hint Value
+    var find_pw_phone_edittext_hint_color = Color.parseColor("#902e2e2e") // EditText Hint Color
+
+    // FIND PW - Phone (Request Auth Number Button Attribute)
+    var find_pw_request_auth_button_scaleX              = 0.2f // 0.3f
+    var find_pw_request_auth_button_scaleY              = 0.06f - 0.008f // 0.008f (언더바 마진 만큼 크기를 줄여서 center를 맞춘다.)
+    var find_pw_request_auth_button_marginBottom        = 0.008f
+    var find_pw_request_auth_button_background_resource = R.drawable.round // R.drawable.xxxx
+    var find_pw_request_auth_button_background_color    = Color.parseColor("#ffffff")
+    var find_pw_request_auth_button_text_value          = "인증번호 요청"
+    var find_pw_request_auth_button_text_size           = 12f // sp
+    var find_pw_request_auth_button_text_color          = Color.parseColor("#222222")
+
+    // FIND PW - Phone (UnderBar Attribute)
+    var find_pw_phone_use_under_bar                 = true      // 언더바 사용 유무
+    var find_pw_phone_under_bar_height              = 0.002f    // 언더바 두께
+    var find_pw_phone_under_bar_marginBottom        = 0.008f
+    var find_pw_phone_under_bar_under_bar_color     = Color.parseColor("#2e2e2e")  // 언더바 색
+    // ========================================================================================
+
+
+
+    // ======================================== [Phone Auth] ========================================
+    // FIND PW - Phone Auth (ImageView Attribute)
+    var find_pw_phone_auth_imageview_icon_scaleX = 0.08f
+    var find_pw_phone_auth_imageview_icon_scaleY = 0.08f
+    var find_pw_phone_auth_imageview_icon_resource = R.drawable.icon_confirm  // Phone Icon Resource
+
+    // FIND PW - Phone Auth (EditText Attribute)
+    var find_pw_phone_auth_edittext_scaleX = find_id_sub_parent_input_phone_layout_scaleX - find_id_sub_parent_input_phone_layout_scaleY
+    var find_pw_phone_auth_edittext_scaleY = 0.08f
+    var find_pw_phone_auth_edittext_marginLeft = 0.1f                                    // icon과 EditText 사이 간격
+    var find_pw_phone_auth_edittext_max_length = 20                                      // EditText Max Length
+    var find_pw_phone_auth_edittext_text_color = Color.parseColor("#2e2e2e")   // EditText Text Color
+    var find_pw_phone_auth_edittext_hint_value = "인증번호 입력"                              // EditText Hint Value
+    var find_pw_phone_auth_edittext_hint_color = Color.parseColor("#902e2e2e") // EditText Hint Color
+
+    // FIND PW - Phone Auth (Confirm Auth Number Button Attribute)
+    var find_pw_phone_auth_confirm_auth_button_scaleX              = 0.2f // 0.3f
+    var find_pw_phone_auth_confirm_auth_button_scaleY              = 0.06f - 0.008f // 0.008f (언더바 마진 만큼 크기를 줄여서 center를 맞춘다.)
+    var find_pw_phone_auth_confirm_auth_button_marginBottom        = 0.008f
+    var find_pw_phone_auth_confirm_auth_button_background_resource = R.drawable.round // R.drawable.xxxx
+    var find_pw_phone_auth_confirm_auth_button_background_color    = Color.parseColor("#ffffff")
+    var find_pw_phone_auth_confirm_auth_button_text_value          = "인증번호 확인"
+    var find_pw_phone_auth_confirm_auth_button_text_size           = 12f // sp
+    var find_pw_phone_auth_confirm_auth_button_text_color          = Color.parseColor("#222222")
+
+    // FIND PW - Phone Auth (UnderBar Attribute)
+    var find_pw_phone_auth_use_under_bar = true      // 언더바 사용 유무
+    var find_pw_phone_auth_under_bar_height = 0.002f    // 언더바 두께
+    var find_pw_phone_auth_under_bar_marginBottom = 0.008f
+    var find_pw_phone_auth_under_bar_under_bar_color = Color.parseColor("#2e2e2e")  // 언더바 색
+    // ========================================================================================
+
+
+
+    // ======================================== [Find Pw Button] ========================================
+    // FIND PW - Main Find PW Button Attribute
+    var find_pw_find_button_background_resource  = R.drawable.round
+    var find_pw_find_button_background_color     = DATA_NONE
+    var find_pw_find_button_scaleX               = 0.9f
+    var find_pw_find_button_scaleY               = 0.07f
+    var find_pw_find_button_margin_top           = 0.1f
+    var find_pw_find_button_marginBottom         = 0.03f
+    var find_pw_find_button_text_value           = "비밀번호 찾기"
+    var find_pw_find_button_text_color           = Color.parseColor("#2e2e2e")
+    var find_pw_find_button_text_size            = 14f
+    // ==============================================================================================
+
+    // ==============================================================================================
+    // [end] 비밀번호 찾기 Type A =====================================================================
+    // ==============================================================================================
+
+    /** [End][아이디/비밀번호 찾기] ------------------------------------------------------------ **/
+
+
+
+
 
     /** [mainView] ------------------------------------------------------**/
 

@@ -8,8 +8,10 @@ import android.graphics.Color
 import com.codberg.mvvm_type_A.sample.view.MainViewManager
 
 import android.os.Bundle
+import android.text.Editable
 import android.text.InputFilter
 import android.text.InputType
+import android.text.TextWatcher
 import android.view.Gravity
 import android.view.View
 import android.widget.*
@@ -55,6 +57,14 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
         when(key) {
             "signup" -> {
                 viewModel.compositeDisposable.clear()
+
+                // 회원가입에 대한 observer settings
+                setSignupObserver()
+            }
+
+            "findIdPw" -> {
+                viewModel.compositeFindIdDisposable.clear()
+                viewModel.compositeFindPwDisposable.clear()
 
                 // 회원가입에 대한 observer settings
                 setSignupObserver()
@@ -201,8 +211,9 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
      */
     private fun setSignupObserver() {
 
+        // 아이디/비밀번호 찾기 type A - ViewHolder
         /** Find UI - find Id Holder */
-        class FindIdViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        class FindIdViewHolderTypeA(view: View) : RecyclerView.ViewHolder(view) {
             // Main Layout
             var findIdMainParent: LinearLayout = init.find_id_view_type_a_adapter_main_parent
 
@@ -226,11 +237,11 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
                         layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
                             .apply {
                                 orientation = LinearLayout.VERTICAL
-                                setMargins(0, (mDevHeight.toFloat() * 0.1f).toInt(), 0, 0)
+                                setMargins(0, (mDevHeight.toFloat() * find_id_main_parent_layout_margin_top).toInt(), 0, 0)
                             }
 
                         find_id_view_type_a_sub_parent_input_phone.apply {
-                            layoutParams = LinearLayout.LayoutParams((mDevWidth.toFloat() * signup_sub_parent_input_scaleX).toInt(), (mDevHeight.toFloat() * signup_sub_parent_input_scaleY).toInt())
+                            layoutParams = LinearLayout.LayoutParams((mDevWidth.toFloat() * find_id_sub_parent_input_phone_layout_scaleX).toInt(), (mDevHeight.toFloat() * find_id_sub_parent_input_phone_layout_scaleY).toInt())
                                 .apply {
                                     gravity = Gravity.CENTER_HORIZONTAL
                                 }
@@ -239,37 +250,60 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
                         }
 
                         find_id_view_type_a_sub_parent_input_phone_auth.apply {
-                            layoutParams = LinearLayout.LayoutParams((mDevWidth.toFloat() * signup_sub_parent_input_scaleX).toInt(), (mDevHeight.toFloat() * signup_sub_parent_input_scaleY).toInt())
+                            layoutParams = LinearLayout.LayoutParams((mDevWidth.toFloat() * find_id_sub_parent_input_phone_layout_scaleX).toInt(), (mDevHeight.toFloat() * find_id_sub_parent_input_phone_layout_scaleY).toInt())
                                 .apply {
                                     gravity = Gravity.CENTER_HORIZONTAL
                                 }
 
                             setFindPhoneAuthUI()
+
+                            var sub_parent_input_phone_auth_timer: RelativeLayout = init.find_id_view_type_a_sub_parent_input_phone_auth_timer_layout
+                            var sub_parent_input_phone_auth_timer_textView: TextView = init.find_id_view_type_a_sub_parent_input_phone_auth_timer_textView
+
+                            sub_parent_input_phone_auth_timer.apply {
+                                init.apply {
+                                    layoutParams = LinearLayout.LayoutParams(wrapContent, wrapContent).apply {
+                                        setMargins((mDevWidth.toFloat() * 0.05f).toInt(), 0, 0, 0)
+                                    }
+                                }
+
+                                sub_parent_input_phone_auth_timer_textView.apply {
+                                    init.apply {
+                                        text = "남은 시간 0$auth_time:00"
+                                        textSize = 12f
+                                        textColor = Color.RED
+                                    }
+                                }
+                            }
                         }
 
                         find_id_view_type_a_sub_parent_input_find_button_layout.apply {
-                            layoutParams = LinearLayout.LayoutParams((mDevWidth.toFloat() * 0.9f).toInt(), matchParent)
+                            layoutParams = LinearLayout.LayoutParams((mDevWidth.toFloat() * find_id_sub_parent_input_phone_layout_scaleX).toInt(), matchParent)
                                 .apply {
                                     gravity = Gravity.CENTER_HORIZONTAL
                                 }
 
                             findIdButtonView.apply {
-                                if(signup_complete_button_background_resource != DATA_NONE) {
-                                    layoutParams = LinearLayout.LayoutParams((mDevWidth.toFloat() * signup_complete_button_scaleX).toInt(), (mDevHeight.toFloat() * signup_complete_button_scaleY).toInt())
+                                if(find_id_find_button_background_resource != DATA_NONE) {
+                                    layoutParams = LinearLayout.LayoutParams((mDevWidth.toFloat() * find_id_find_button_scaleX).toInt(), (mDevHeight.toFloat() * find_id_find_button_scaleY).toInt())
                                         .apply {
-                                            backgroundResource = signup_complete_button_background_resource
-                                            setMargins(0,(mDevHeight.toFloat() * 0.1f).toInt(),0, 0)
+                                            backgroundResource = find_id_find_button_background_resource
+                                            setMargins(0,(mDevHeight.toFloat() * find_id_find_button_margin_top).toInt(),0, 0)
                                         }
 
                                 } else {
                                     layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
                                 }
 
-                                if(signup_complete_button_background_color != DATA_NONE) backgroundColor = signup_complete_button_background_color
+                                if(find_id_find_button_background_color != DATA_NONE) backgroundColor = find_id_find_button_background_color
 
-                                text = find_Id_complete_button_text_value
-                                textColor = signup_complete_button_text_color
-                                textSize = signup_complete_button_text_size
+                                text = find_id_find_button_text_value
+                                textColor = find_id_find_button_text_color
+                                textSize = find_id_find_button_text_size
+
+                                setOnClickListener {
+                                    viewModel.findIdButton()
+                                }
                             }
                         }
                     }
@@ -280,26 +314,26 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
             private fun setFindPhoneUI() {
                 init.apply {
                     findPhoneIdIconImageView.apply {
-                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * signup_sub_parent_input_imageView_scaleX).toInt(), (mDevHeight.toFloat() * signup_sub_parent_input_imageView_scaleY).toInt())
+                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * find_id_phone_imageview_icon_scaleX).toInt(), (mDevHeight.toFloat() * find_id_phone_imageview_icon_scaleY).toInt())
                             .apply {
                                 addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
-                                setImageResource(icon_phone_drawable_resource)
+                                setImageResource(find_id_phone_imageview_icon_resource)
                             }
                     }
 
                     findPhoneIdEditTextView.apply {
-                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * signup_sub_parent_input_editTextView_scaleX).toInt(), (mDevHeight.toFloat() * signup_sub_parent_input_editTextView_scaleY).toInt())
+                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * find_id_phone_edittext_scaleX).toInt(), (mDevHeight.toFloat() * find_id_phone_edittext_scaleY).toInt())
                             .apply {
                                 background = ContextCompat.getDrawable(mContext, android.R.color.transparent)
 
-                                hint = editText_phone_hint_value
-                                setHintTextColor(editText_hint_color)
+                                hint = find_id_phone_edittext_hint_value
+                                setHintTextColor(find_id_phone_edittext_hint_color)
 
-                                setTextColor(editText_text_color)
+                                setTextColor(find_id_phone_edittext_text_color)
 
                                 maxLines = 1
                                 singleLine = true
-                                filters = arrayOf(InputFilter.LengthFilter(editText_phone_max_length))
+                                filters = arrayOf(InputFilter.LengthFilter(find_id_phone_edittext_max_length))
 
                                 inputType = InputType.TYPE_CLASS_NUMBER
 
@@ -307,40 +341,49 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
 
                                 addRule(RelativeLayout.RIGHT_OF, findPhoneIdIconImageView.id)
 
-                                setMargins((mDevWidth.toFloat() * signup_sub_parent_input_editTextView_marginLeft).toInt(),0,0, 0)
+                                setMargins((mDevWidth.toFloat() * find_id_phone_edittext_marginLeft).toInt(),0,0, 0)
                             }
+
+                        addTextChangedListener(object : TextWatcher {
+                            override fun afterTextChanged(editable: Editable?) {
+                                   viewModel.findIdPhoneEditTextAfterChanged(editable.toString())
+                            }
+                            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+                            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+                        })
                     }
 
                     findPhoneIdButtonView.apply {
-                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * passwordAuth_button_scaleX).toInt(), (mDevHeight.toFloat() * passwordAuth_button_scaleY).toInt())
+                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * find_id_request_auth_button_scaleX).toInt(), (mDevHeight.toFloat() * find_id_request_auth_button_scaleY).toInt())
                             .apply {
                                 addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE)
                                 addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
-                                setMargins(0,0,0,(mDevHeight.toFloat() * signup_sub_parent_input_view_marginBottom).toInt())
+                                setMargins(0,0,0,(mDevHeight.toFloat() * find_id_request_auth_button_marginBottom).toInt())
 
-                                if(passwordAuth_button_background_resource != DATA_NONE) backgroundResource = passwordAuth_button_background_resource
-                                else if(passwordAuth_button_background_color != DATA_NONE) backgroundColor = passwordAuth_button_background_color
+                                if(find_id_request_auth_button_background_resource != DATA_NONE) backgroundResource = find_id_request_auth_button_background_resource
+                                else if(find_id_request_auth_button_background_color != DATA_NONE) backgroundColor = find_id_request_auth_button_background_color
 
-                                text = passwordAuth_button_text_value
-                                textSize = passwordAuth_button_text_size
-                                textColor = passwordAuth_button_text_color
+                                text = find_id_request_auth_button_text_value
+                                textSize = find_id_request_auth_button_text_size
+                                textColor = find_id_request_auth_button_text_color
                             }
 
                         setOnClickListener {
-                            // viewModel.requestPhoneAuth(sub_parent_input_editTextView_phone.text.toString(), auth_time)
+                             // todo -> call viewModel timer method
+                            viewModel.requestPhoneAuth(find_id_view_type_a_sub_parent_input_editTextView_phone.text.toString(), auth_time, 1)
                         }
                     }
 
                     findPhoneIdUnderBarView.apply {
-                        if(!init.use_under_bar) visibility = View.GONE
+                        if(!init.find_id_phone_use_under_bar) visibility = View.GONE
 
-                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * signup_sub_parent_input_scaleX).toInt() - (mDevWidth.toFloat() * init.passwordAuth_confirm_button_scaleX).toInt(), (mDevHeight.toFloat() * under_bar_height).toInt())
+                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * find_id_sub_parent_input_phone_layout_scaleX).toInt() - (mDevWidth.toFloat() * init.find_id_request_auth_button_scaleX).toInt(), (mDevHeight.toFloat() * find_id_phone_under_bar_height).toInt())
                             .apply {
-                                backgroundColor = under_bar_color
+                                backgroundColor = find_id_phone_under_bar_under_bar_color
 
                                 addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
 
-                                setMargins(0,0,0,(mDevHeight.toFloat() * signup_sub_parent_input_view_marginBottom).toInt())
+                                setMargins(0,0,0,(mDevHeight.toFloat() * find_id_phone_under_bar_marginBottom).toInt())
                             }
                     }
                 }
@@ -350,27 +393,27 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
             private fun setFindPhoneAuthUI() {
                 init.apply {
                     findPhoneAuthIdIconImageView.apply {
-                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * signup_sub_parent_input_imageView_scaleX).toInt(), (mDevHeight.toFloat() * signup_sub_parent_input_imageView_scaleY).toInt())
+                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * find_id_phone_auth_imageview_icon_scaleX).toInt(), (mDevHeight.toFloat() * find_id_phone_auth_imageview_icon_scaleY).toInt())
                             .apply {
                                 addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
 
-                                setImageResource(icon_phoneAuth_drawable_resource)
+                                setImageResource(find_id_phone_auth_imageview_icon_resource)
                             }
                     }
 
                     findPhoneAuthIdEditTextView.apply {
-                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * signup_sub_parent_input_editTextView_scaleX).toInt(), (mDevHeight.toFloat() * signup_sub_parent_input_editTextView_scaleY).toInt())
+                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * find_id_phone_auth_edittext_scaleX).toInt(), (mDevHeight.toFloat() * find_id_phone_auth_edittext_scaleY).toInt())
                             .apply {
                                 background = ContextCompat.getDrawable(mContext, android.R.color.transparent)
 
-                                hint = editText_phoneAuth_hint_value
-                                setHintTextColor(editText_hint_color)
+                                hint = find_id_phone_auth_edittext_hint_value
+                                setHintTextColor(find_id_phone_auth_edittext_hint_color)
 
-                                setTextColor(editText_text_color)
+                                setTextColor(find_id_phone_auth_edittext_text_color)
 
                                 maxLines = 1
                                 singleLine = true
-                                filters = arrayOf(InputFilter.LengthFilter(editText_phoneAuth_max_length))
+                                filters = arrayOf(InputFilter.LengthFilter(find_id_phone_auth_edittext_max_length))
 
                                 inputType = InputType.TYPE_CLASS_NUMBER
 
@@ -379,49 +422,48 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
                                 addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE)
                                 addRule(RelativeLayout.RIGHT_OF, findPhoneAuthIdEditTextView.id)
 
-                                setMargins((mDevWidth.toFloat() * signup_sub_parent_input_editTextView_marginLeft).toInt(),0,0, 0)
+                                setMargins((mDevWidth.toFloat() * find_id_phone_auth_edittext_marginLeft).toInt(),0,0, 0)
                             }
                     }
 
                     findPhoneAuthIdButtonView.apply {
-                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * passwordAuth_confirm_button_scaleX).toInt(), (mDevHeight.toFloat() * passwordAuth_confirm_button_scaleY).toInt())
+                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * find_id_phone_auth_confirm_auth_button_scaleX).toInt(), (mDevHeight.toFloat() * find_id_phone_auth_confirm_auth_button_scaleY).toInt())
                             .apply {
                                 addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE)
                                 addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
-                                setMargins(0,0,0,(mDevHeight.toFloat() * signup_sub_parent_input_view_marginBottom).toInt())
+                                setMargins(0,0,0,(mDevHeight.toFloat() * find_id_phone_auth_confirm_auth_button_marginBottom).toInt())
 
-                                if(passwordAuth_confirm_button_background_resource != DATA_NONE) backgroundResource = passwordAuth_confirm_button_background_resource
-                                else if(passwordAuth_confirm_button_background_color != DATA_NONE) backgroundColor = passwordAuth_confirm_button_background_color
+                                if(find_id_phone_auth_confirm_auth_button_background_resource != DATA_NONE) backgroundResource = find_id_phone_auth_confirm_auth_button_background_resource
+                                else if(find_id_phone_auth_confirm_auth_button_background_color != DATA_NONE) backgroundColor = find_id_phone_auth_confirm_auth_button_background_color
 
-                                text = passwordAuth_confirm_button_text_value
-                                textSize = passwordAuth_confirm_button_text_size
-                                textColor = passwordAuth_confirm_button_text_color
+                                text = find_id_phone_auth_confirm_auth_button_text_value
+                                textSize = find_id_phone_auth_confirm_auth_button_text_size
+                                textColor = find_id_phone_auth_confirm_auth_button_text_color
                             }
 
                         setOnClickListener {
-                            viewModel.onSignUpPhoneAuthConfirmButtonClick(findPhoneAuthIdEditTextView.text.toString())
+                            viewModel.onSignUpPhoneAuthConfirmButtonClick(findPhoneAuthIdEditTextView.text.toString(), 1)
                         }
                     }
 
                     findPhoneAuthIdUnderBarView.apply {
 
-                        if(!init.use_under_bar) visibility = View.GONE
+                        if(!init.find_id_phone_auth_use_under_bar) visibility = View.GONE
 
-                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * signup_sub_parent_input_scaleX).toInt() - (mDevWidth.toFloat() * init.passwordAuth_confirm_button_scaleX).toInt(), (mDevHeight.toFloat() * under_bar_height).toInt())
+                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * find_id_sub_parent_input_phone_layout_scaleX).toInt() - (mDevWidth.toFloat() * init.find_id_phone_auth_confirm_auth_button_scaleX).toInt(), (mDevHeight.toFloat() * find_id_phone_auth_under_bar_height).toInt())
                             .apply {
-                                backgroundColor = under_bar_color
+                                backgroundColor = find_id_phone_auth_under_bar_under_bar_color
 
                                 addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
 
-                                setMargins(0,0,0,(mDevHeight.toFloat() * signup_sub_parent_input_view_marginBottom).toInt())
+                                setMargins(0,0,0,(mDevHeight.toFloat() * find_id_phone_auth_under_bar_marginBottom).toInt())
                             }
                     }
                 }
             }
         }
-
         /** Find UI - find Password Holder */
-        class FindPwViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        class FindPwViewHolderTypeA(view: View) : RecyclerView.ViewHolder(view) {
             // Main Layout
             var findPwMainParent: LinearLayout = init.find_pw_view_type_a_adapter_main_parent
 
@@ -450,11 +492,11 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
                         layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
                             .apply {
                                 orientation = LinearLayout.VERTICAL
-                                setMargins(0, (mDevHeight.toFloat() * 0.1f).toInt(), 0, 0)
+                                setMargins(0, (mDevHeight.toFloat() * find_pw_main_parent_layout_margin_top).toInt(), 0, 0)
                             }
 
                         find_pw_view_type_a_sub_parent_input_id_email.apply {
-                            layoutParams = LinearLayout.LayoutParams((mDevWidth.toFloat() * signup_sub_parent_input_scaleX).toInt(), (mDevHeight.toFloat() * signup_sub_parent_input_scaleY).toInt())
+                            layoutParams = LinearLayout.LayoutParams((mDevWidth.toFloat() * find_pw_sub_parent_input_phone_layout_scaleX).toInt(), (mDevHeight.toFloat() * find_pw_sub_parent_input_phone_layout_scaleY).toInt())
                                 .apply {
                                     gravity = Gravity.CENTER_HORIZONTAL
                                 }
@@ -463,7 +505,7 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
                         }
 
                         find_pw_view_type_a_sub_parent_input_phone.apply {
-                            layoutParams = LinearLayout.LayoutParams((mDevWidth.toFloat() * signup_sub_parent_input_scaleX).toInt(), (mDevHeight.toFloat() * signup_sub_parent_input_scaleY).toInt())
+                            layoutParams = LinearLayout.LayoutParams((mDevWidth.toFloat() * find_pw_sub_parent_input_phone_layout_scaleX).toInt(), (mDevHeight.toFloat() * find_pw_sub_parent_input_phone_layout_scaleY).toInt())
                                 .apply {
                                     gravity = Gravity.CENTER_HORIZONTAL
                                 }
@@ -472,15 +514,466 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
                         }
 
                         find_pw_view_type_a_sub_parent_input_phone_auth.apply {
-                            layoutParams = LinearLayout.LayoutParams((mDevWidth.toFloat() * signup_sub_parent_input_scaleX).toInt(), (mDevHeight.toFloat() * signup_sub_parent_input_scaleY).toInt())
+                            layoutParams = LinearLayout.LayoutParams((mDevWidth.toFloat() * find_pw_sub_parent_input_phone_layout_scaleX).toInt(), (mDevHeight.toFloat() * find_pw_sub_parent_input_phone_layout_scaleY).toInt())
                                 .apply {
                                     gravity = Gravity.CENTER_HORIZONTAL
                                 }
 
                             setFindPhoneAuthUI()
+
+                            var sub_parent_input_phone_auth_timer: RelativeLayout = init.find_pw_view_type_a_sub_parent_input_phone_auth_timer_layout
+                            var sub_parent_input_phone_auth_timer_textView: TextView = init.find_pw_view_type_a_sub_parent_input_phone_auth_timer_textView
+
+                            sub_parent_input_phone_auth_timer.apply {
+                                init.apply {
+                                    layoutParams = LinearLayout.LayoutParams(wrapContent, wrapContent).apply {
+                                        setMargins((mDevWidth.toFloat() * 0.05f).toInt(), 0, 0, 0)
+                                    }
+                                }
+
+                                sub_parent_input_phone_auth_timer_textView.apply {
+                                    init.apply {
+                                        text = "남은 시간 0$auth_time:00"
+                                        textSize = 12f
+                                        textColor = Color.RED
+                                    }
+                                }
+                            }
                         }
 
                         find_pw_view_type_a_sub_parent_input_find_button_layout.apply {
+                            layoutParams = LinearLayout.LayoutParams((mDevWidth.toFloat() * find_pw_sub_parent_input_phone_layout_scaleX).toInt(), matchParent)
+                                .apply {
+                                    gravity = Gravity.CENTER_HORIZONTAL
+                                }
+
+                            findPwButtonView.apply {
+                                if(find_pw_find_button_background_resource != DATA_NONE) {
+                                    layoutParams = LinearLayout.LayoutParams((mDevWidth.toFloat() * find_pw_find_button_scaleX).toInt(), (mDevHeight.toFloat() * find_pw_find_button_scaleY).toInt())
+                                        .apply {
+                                            backgroundResource = find_pw_find_button_background_resource
+                                            setMargins(0,(mDevHeight.toFloat() * find_pw_find_button_margin_top).toInt(),0, 0)
+                                        }
+
+                                } else {
+                                    layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
+                                }
+
+                                if(find_pw_find_button_background_color != DATA_NONE) backgroundColor = find_pw_find_button_background_color
+
+                                text = find_pw_find_button_text_value
+                                textColor = find_pw_find_button_text_color
+                                textSize = find_pw_find_button_text_size
+
+                                setOnClickListener {
+                                    viewModel.findPwButton()
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            /** 아이디 or 이메일 입력 UI */
+            private fun setFindIdEmailUI() {
+                init.apply {
+                    findPwInputIdEmailIconImageView.apply {
+                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * find_pw_IdEmail_imageview_icon_scaleX).toInt(), (mDevHeight.toFloat() * find_pw_IdEmail_imageview_icon_scaleY).toInt())
+                            .apply {
+                                addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
+                                setImageResource(find_pw_IdEmail_imageview_icon_resource)
+                            }
+                    }
+
+                    findPwInputIdEmailEditTextView.apply {
+                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * find_pw_IdEmail_edittext_scaleX).toInt(), (mDevHeight.toFloat() * find_pw_IdEmail_edittext_scaleY).toInt())
+                            .apply {
+                                background = ContextCompat.getDrawable(mContext, android.R.color.transparent)
+
+                                hint = find_pw_IdEmail_edittext_hint_value
+                                setHintTextColor(find_pw_IdEmail_edittext_hint_color)
+
+                                setTextColor(find_pw_IdEmail_edittext_text_color)
+
+                                maxLines = 1
+                                singleLine = true
+                                filters = arrayOf(InputFilter.LengthFilter(find_pw_IdEmail_edittext_max_length))
+
+                                inputType = InputType.TYPE_CLASS_NUMBER
+
+                                addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
+
+                                addRule(RelativeLayout.RIGHT_OF, findPwInputIdEmailIconImageView.id)
+
+                                setMargins((mDevWidth.toFloat() * find_pw_IdEmail_edittext_marginLeft).toInt(),0,0, 0)
+                            }
+
+                        addTextChangedListener(object : TextWatcher {
+                            override fun afterTextChanged(editable: Editable?) {
+                                   viewModel.findPwEmailEditTextAfterChanged(editable.toString())
+                            }
+                            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+                            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+                        })
+                    }
+
+                    findPwInputIdEmailUnderBarView.apply {
+                        if(!init.find_pw_IdEmail_use_under_bar) visibility = View.GONE
+
+                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * find_pw_IdEmail_edittext_scaleX).toInt(), (mDevHeight.toFloat() * find_pw_IdEmail_under_bar_height).toInt())
+                            .apply {
+                                backgroundColor = find_pw_IdEmail_under_bar_under_bar_color
+
+                                addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
+
+                                setMargins(0,0,0,(mDevHeight.toFloat() * find_pw_IdEmail_under_bar_marginBottom).toInt())
+                            }
+                    }
+                }
+            }
+
+            /** 휴대폰 번호 입력 UI */
+            private fun setFindPhoneUI() {
+                init.apply {
+                    findPwInputPhoneIconImageView.apply {
+                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * find_pw_phone_imageview_icon_scaleX).toInt(), (mDevHeight.toFloat() * find_pw_phone_imageview_icon_scaleY).toInt())
+                            .apply {
+                                addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
+                                setImageResource(find_pw_phone_imageview_icon_resource)
+                            }
+                    }
+
+                    findPwInputPhoneEditTextView.apply {
+                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * find_pw_phone_edittext_scaleX).toInt(), (mDevHeight.toFloat() * find_pw_phone_edittext_scaleY).toInt())
+                            .apply {
+                                background = ContextCompat.getDrawable(mContext, android.R.color.transparent)
+
+                                hint = find_pw_phone_edittext_hint_value
+                                setHintTextColor(find_pw_phone_edittext_hint_color)
+
+                                setTextColor(find_pw_phone_edittext_text_color)
+
+                                maxLines = 1
+                                singleLine = true
+                                filters = arrayOf(InputFilter.LengthFilter(find_pw_phone_edittext_max_length))
+
+                                inputType = InputType.TYPE_CLASS_NUMBER
+
+                                addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
+
+                                addRule(RelativeLayout.RIGHT_OF, findPwInputPhoneIconImageView.id)
+
+                                setMargins((mDevWidth.toFloat() * find_pw_phone_edittext_marginLeft).toInt(),0,0, 0)
+                            }
+
+                        addTextChangedListener(object : TextWatcher {
+                            override fun afterTextChanged(editable: Editable?) {
+                                viewModel.findPwPhoneEditTextAfterChanged(editable.toString())
+                            }
+                            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+                            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+                        })
+                    }
+
+                    findPwInputPhoneUnderBarView.apply {
+                        if(!init.use_under_bar) visibility = View.GONE
+
+                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * find_pw_sub_parent_input_phone_layout_scaleX).toInt() - (mDevWidth.toFloat() * init.find_pw_request_auth_button_scaleX).toInt(), (mDevHeight.toFloat() * find_pw_phone_under_bar_height).toInt())
+                            .apply {
+                                backgroundColor = find_pw_phone_under_bar_under_bar_color
+
+                                addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
+
+                                setMargins(0,0,0,(mDevHeight.toFloat() * find_pw_phone_under_bar_marginBottom).toInt())
+                            }
+                    }
+
+                    findPwInputPhoneButtonView.apply {
+                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * find_pw_request_auth_button_scaleX).toInt(), (mDevHeight.toFloat() * find_pw_request_auth_button_scaleY).toInt())
+                            .apply {
+                                addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE)
+                                addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
+                                setMargins(0,0,0,(mDevHeight.toFloat() * find_pw_request_auth_button_marginBottom).toInt())
+
+                                if(find_pw_request_auth_button_background_resource != DATA_NONE) backgroundResource = find_pw_request_auth_button_background_resource
+                                else if(find_pw_request_auth_button_background_color != DATA_NONE) backgroundColor = find_pw_request_auth_button_background_color
+
+                                text = find_pw_request_auth_button_text_value
+                                textSize = find_pw_request_auth_button_text_size
+                                textColor = find_pw_request_auth_button_text_color
+                            }
+
+                        setOnClickListener {
+                            // todo -> call viewModel timer method
+                            viewModel.requestPhoneAuth(find_pw_view_type_a_sub_parent_input_editTextView_phone.text.toString(), auth_time, 2)
+                        }
+                    }
+                }
+            }
+
+            /** 인증 번호 입력 UI */
+            private fun setFindPhoneAuthUI() {
+                init.apply {
+                    findPwPhoneAuthIdIconImageView.apply {
+                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * find_pw_phone_auth_imageview_icon_scaleX).toInt(), (mDevHeight.toFloat() * find_pw_phone_auth_imageview_icon_scaleY).toInt())
+                            .apply {
+                                addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
+
+                                setImageResource(find_pw_phone_auth_imageview_icon_resource)
+                            }
+                    }
+
+                    findPwPhoneAuthIdEditTextView.apply {
+                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * find_pw_phone_auth_edittext_scaleX).toInt(), (mDevHeight.toFloat() * find_pw_phone_auth_edittext_scaleY).toInt())
+                            .apply {
+                                background = ContextCompat.getDrawable(mContext, android.R.color.transparent)
+
+                                hint = find_pw_phone_auth_edittext_hint_value
+                                setHintTextColor(find_pw_phone_auth_edittext_hint_color)
+
+                                setTextColor(find_pw_phone_auth_edittext_text_color)
+
+                                maxLines = 1
+                                singleLine = true
+                                filters = arrayOf(InputFilter.LengthFilter(find_pw_phone_auth_edittext_max_length))
+
+                                inputType = InputType.TYPE_CLASS_NUMBER
+
+                                addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
+
+                                addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE)
+                                addRule(RelativeLayout.RIGHT_OF, findPwPhoneAuthIdEditTextView.id)
+
+                                setMargins((mDevWidth.toFloat() * find_pw_phone_auth_edittext_marginLeft).toInt(),0,0, 0)
+                            }
+                    }
+
+                    findPwPhoneAuthIdButtonView.apply {
+                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * find_pw_phone_auth_confirm_auth_button_scaleX).toInt(), (mDevHeight.toFloat() * find_pw_phone_auth_confirm_auth_button_scaleY).toInt())
+                            .apply {
+                                addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE)
+                                addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
+                                setMargins(0,0,0,(mDevHeight.toFloat() * find_pw_phone_auth_confirm_auth_button_marginBottom).toInt())
+
+                                if(find_pw_phone_auth_confirm_auth_button_background_resource != DATA_NONE) backgroundResource = find_pw_phone_auth_confirm_auth_button_background_resource
+                                else if(find_pw_phone_auth_confirm_auth_button_background_color != DATA_NONE) backgroundColor = find_pw_phone_auth_confirm_auth_button_background_color
+
+                                text = find_pw_phone_auth_confirm_auth_button_text_value
+                                textSize = find_pw_phone_auth_confirm_auth_button_text_size
+                                textColor = find_pw_phone_auth_confirm_auth_button_text_color
+                            }
+
+                        setOnClickListener {
+                            viewModel.onSignUpPhoneAuthConfirmButtonClick(findPwPhoneAuthIdEditTextView.text.toString(), 2)
+                        }
+                    }
+
+                    findPwPhoneAuthIdUnderBarView.apply {
+                        if(!init.find_pw_phone_auth_use_under_bar) visibility = View.GONE
+
+                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * find_pw_sub_parent_input_phone_layout_scaleX).toInt() - (mDevWidth.toFloat() * init.find_pw_phone_auth_confirm_auth_button_scaleX).toInt(), (mDevHeight.toFloat() * find_pw_phone_auth_under_bar_height).toInt())
+                            .apply {
+                                backgroundColor = find_pw_phone_auth_under_bar_under_bar_color
+
+                                addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
+
+                                setMargins(0,0,0,(mDevHeight.toFloat() * find_pw_phone_auth_under_bar_marginBottom).toInt())
+                            }
+                    }
+                }
+            }
+        }
+
+        // 아아디/비밀번호 찾기 type B - auth code ViewHolder
+        class FindIdViewHolderTypeB(view: View) : RecyclerView.ViewHolder(view) {
+            var findIdMainParent: LinearLayout = init.find_id_view_type_b_adapater_main_parent
+
+            // 휴대폰 번호 입력
+            var findPhoneIdIconImageView: ImageView = init.find_id_view_type_b_sub_parent_input_imageView_phone
+            var findPhoneIdEditTextView: EditText = init.find_id_view_type_b_sub_parent_input_editTextView_phone
+            var findPhoneIdUnderBarView: View = init.find_id_view_type_b_sub_parent_input_view_phone
+
+            var findIdButtonView: Button = init.find_id_view_type_b_sub_parent_input_find_button
+
+            init {
+                init.apply {
+                    findIdMainParent.apply {
+                        layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
+                            .apply {
+                                orientation = LinearLayout.VERTICAL
+                                setMargins(0, (mDevHeight.toFloat() * 0.1f).toInt(), 0, 0)
+                            }
+
+                        find_id_view_type_b_sub_parent_input_phone.apply {
+                            layoutParams = LinearLayout.LayoutParams(
+                                (mDevWidth.toFloat() * signup_sub_parent_input_scaleX).toInt(),
+                                (mDevHeight.toFloat() * signup_sub_parent_input_scaleY).toInt()
+                            )
+                                .apply {
+                                    gravity = Gravity.CENTER_HORIZONTAL
+                                }
+
+                            setFindPhoneUI()
+                        }
+
+                        find_id_view_type_b_sub_parent_input_find_button_layout.apply {
+                            layoutParams = LinearLayout.LayoutParams((mDevWidth.toFloat() * 0.9f).toInt(), matchParent)
+                                .apply {
+                                    gravity = Gravity.CENTER_HORIZONTAL
+                                }
+
+                            findIdButtonView.apply {
+                                if (signup_complete_button_background_resource != DATA_NONE) {
+                                    layoutParams = LinearLayout.LayoutParams(
+                                        (mDevWidth.toFloat() * signup_complete_button_scaleX).toInt(),
+                                        (mDevHeight.toFloat() * signup_complete_button_scaleY).toInt()
+                                    )
+                                        .apply {
+                                            backgroundResource = signup_complete_button_background_resource
+                                            setMargins(0, (mDevHeight.toFloat() * 0.1f).toInt(), 0, 0)
+                                        }
+
+                                } else {
+                                    layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
+                                }
+
+                                if (signup_complete_button_background_color != DATA_NONE) backgroundColor =
+                                    signup_complete_button_background_color
+
+                                text = "다음"
+                                textColor = signup_complete_button_text_color
+                                textSize = signup_complete_button_text_size
+//                            }
+                            }
+
+                            findIdButtonView.setOnClickListener {
+                                // todo -> getViewUtil의 addView 수정이 필요함. 무조건 새창으로 띄우는 부분이 개선 되어야 할 것 같음.
+//                                (it.rootView as LinearLayout).addView()
+
+//                                getViewUtil()?.addView("authCode", init.getAuthCodeView(mContext), ViewUtil.ANIMATION_FADE_IN, ViewUtil.ANIMATION_FADE_OUT, object : ViewUtil.addViewInitListener {
+//                                    override fun onCreateView(p0: View?) {
+//                                        var parent: LinearLayout = it.rootView as LinearLayout
+//
+//                                        // Parent Layout Settings
+//                                        parent.apply {
+//                                            init.apply {
+//                                                layoutParams = FrameLayout.LayoutParams(matchParent, matchParent)
+//                                                    .apply {
+//                                                        gravity = Gravity.CENTER_HORIZONTAL
+////                                                        orientation = LinearLayout.VERTICAL
+//                                                        isClickable = true
+//                                                    }
+//
+//                                                if(find_id_pw_background != DATA_NONE)         backgroundResource = find_id_pw_background
+//                                                if(find_id_pw_backgroundColor != DATA_NONE)    backgroundColor = find_id_pw_backgroundColor
+//                                            }
+//                                        }
+//                                    }
+//
+//                                    override fun onRemove() {
+//
+//                                    }
+//                                })
+                            }
+                        }
+                    }
+                }
+            }
+
+            /** 휴대폰 번호 입력 UI */
+            private fun setFindPhoneUI() {
+                init.apply {
+                    findPhoneIdIconImageView.apply {
+                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * signup_sub_parent_input_imageView_scaleX).toInt(), (mDevHeight.toFloat() * signup_sub_parent_input_imageView_scaleY).toInt())
+                            .apply {
+                                addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
+                                setImageResource(find_id_phone_imageview_icon_resource)
+                            }
+                    }
+
+                    findPhoneIdEditTextView.apply {
+                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * signup_sub_parent_input_editTextView_scaleX).toInt(), (mDevHeight.toFloat() * signup_sub_parent_input_editTextView_scaleY).toInt())
+                            .apply {
+                                background = ContextCompat.getDrawable(mContext, android.R.color.transparent)
+
+                                hint = editText_phone_hint_value
+                                setHintTextColor(editText_hint_color)
+
+                                setTextColor(editText_text_color)
+
+                                maxLines = 1
+                                singleLine = true
+                                filters = arrayOf(InputFilter.LengthFilter(editText_phone_max_length))
+
+                                inputType = InputType.TYPE_CLASS_NUMBER
+
+                                addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
+
+                                addRule(RelativeLayout.RIGHT_OF, findPhoneIdIconImageView.id)
+
+                                setMargins((mDevWidth.toFloat() * signup_sub_parent_input_editTextView_marginLeft).toInt(),0,0, 0)
+                            }
+                    }
+
+                    findPhoneIdUnderBarView.apply {
+                        if(!init.use_under_bar) visibility = View.GONE
+
+                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * signup_sub_parent_input_scaleX).toInt(), (mDevHeight.toFloat() * under_bar_height).toInt())
+                            .apply {
+                                backgroundColor = under_bar_color
+
+                                addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
+
+                                setMargins(0,0,0,(mDevHeight.toFloat() * signup_sub_parent_input_view_marginBottom).toInt())
+                            }
+                    }
+                }
+            }
+        }
+        class FindPwViewHolderTypeB(view: View) : RecyclerView.ViewHolder(view) {
+            // Main Layout
+            var findPwMainParent: LinearLayout = init.find_pw_view_type_b_adapter_main_parent
+
+            // 아이디 or 이메일 입력
+            var findPwInputIdEmailIconImageView: ImageView = init.find_pw_view_type_b_sub_parent_input_imageView_id_email
+            var findPwInputIdEmailEditTextView: EditText = init.find_pw_view_type_b_sub_parent_input_editTextView_id_email
+            var findPwInputIdEmailUnderBarView: View = init.find_pw_view_type_b_sub_parent_input_view_id_email
+
+            // 휴대폰 번호 입력
+            var findPwInputPhoneIconImageView: ImageView = init.find_pw_view_type_b_sub_parent_input_imageView_phone
+            var findPwInputPhoneEditTextView: EditText = init.find_pw_view_type_b_sub_parent_input_editTextView_phone
+            var findPwInputPhoneUnderBarView: View = init.find_pw_view_type_b_sub_parent_input_view_phone
+
+            var findPwButtonView: Button = init.find_pw_view_type_b_sub_parent_input_find_button
+
+            init {
+                init.apply {
+                    findPwMainParent.apply {
+                        layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
+                            .apply {
+                                orientation = LinearLayout.VERTICAL
+                                setMargins(0, (mDevHeight.toFloat() * 0.1f).toInt(), 0, 0)
+                            }
+
+                        find_pw_view_type_b_sub_parent_input_id_email.apply {
+                            layoutParams = LinearLayout.LayoutParams((mDevWidth.toFloat() * signup_sub_parent_input_scaleX).toInt(), (mDevHeight.toFloat() * signup_sub_parent_input_scaleY).toInt())
+                                .apply {
+                                    gravity = Gravity.CENTER_HORIZONTAL
+                                }
+
+                            setFindIdEmailUI()
+                        }
+
+                        find_pw_view_type_b_sub_parent_input_phone.apply {
+                            layoutParams = LinearLayout.LayoutParams((mDevWidth.toFloat() * signup_sub_parent_input_scaleX).toInt(), (mDevHeight.toFloat() * signup_sub_parent_input_scaleY).toInt())
+                                .apply {
+                                    gravity = Gravity.CENTER_HORIZONTAL
+                                }
+
+                            setFindPhoneUI()
+                        }
+
+                        find_pw_view_type_b_sub_parent_input_find_button_layout.apply {
                             layoutParams = LinearLayout.LayoutParams((mDevWidth.toFloat() * 0.9f).toInt(), matchParent)
                                 .apply {
                                     gravity = Gravity.CENTER_HORIZONTAL
@@ -500,7 +993,7 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
 
                                 if(signup_complete_button_background_color != DATA_NONE) backgroundColor = signup_complete_button_background_color
 
-                                text = find_Pw_complete_button_text_value
+                                text = "다음"
                                 textColor = signup_complete_button_text_color
                                 textSize = signup_complete_button_text_size
                             }
@@ -597,99 +1090,7 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
                     findPwInputPhoneUnderBarView.apply {
                         if(!init.use_under_bar) visibility = View.GONE
 
-                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * signup_sub_parent_input_scaleX).toInt() - (mDevWidth.toFloat() * init.passwordAuth_confirm_button_scaleX).toInt(), (mDevHeight.toFloat() * under_bar_height).toInt())
-                            .apply {
-                                backgroundColor = under_bar_color
-
-                                addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
-
-                                setMargins(0,0,0,(mDevHeight.toFloat() * signup_sub_parent_input_view_marginBottom).toInt())
-                            }
-                    }
-
-                    findPwInputPhoneButtonView.apply {
-                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * passwordAuth_button_scaleX).toInt(), (mDevHeight.toFloat() * passwordAuth_button_scaleY).toInt())
-                            .apply {
-                                addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE)
-                                addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
-                                setMargins(0,0,0,(mDevHeight.toFloat() * signup_sub_parent_input_view_marginBottom).toInt())
-
-                                if(passwordAuth_button_background_resource != DATA_NONE) backgroundResource = passwordAuth_button_background_resource
-                                else if(passwordAuth_button_background_color != DATA_NONE) backgroundColor = passwordAuth_button_background_color
-
-                                text = passwordAuth_button_text_value
-                                textSize = passwordAuth_button_text_size
-                                textColor = passwordAuth_button_text_color
-                            }
-
-                        setOnClickListener {
-                            // viewModel.requestPhoneAuth(sub_parent_input_editTextView_phone.text.toString(), auth_time)
-                        }
-                    }
-                }
-            }
-
-            /** 인증 번호 입력 UI */
-            private fun setFindPhoneAuthUI() {
-                init.apply {
-                    findPwPhoneAuthIdIconImageView.apply {
-                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * signup_sub_parent_input_imageView_scaleX).toInt(), (mDevHeight.toFloat() * signup_sub_parent_input_imageView_scaleY).toInt())
-                            .apply {
-                                addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
-
-                                setImageResource(icon_phoneAuth_drawable_resource)
-                            }
-                    }
-
-                    findPwPhoneAuthIdEditTextView.apply {
-                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * signup_sub_parent_input_editTextView_scaleX).toInt(), (mDevHeight.toFloat() * signup_sub_parent_input_editTextView_scaleY).toInt())
-                            .apply {
-                                background = ContextCompat.getDrawable(mContext, android.R.color.transparent)
-
-                                hint = editText_phoneAuth_hint_value
-                                setHintTextColor(editText_hint_color)
-
-                                setTextColor(editText_text_color)
-
-                                maxLines = 1
-                                singleLine = true
-                                filters = arrayOf(InputFilter.LengthFilter(editText_phoneAuth_max_length))
-
-                                inputType = InputType.TYPE_CLASS_NUMBER
-
-                                addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
-
-                                addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE)
-                                addRule(RelativeLayout.RIGHT_OF, findPwPhoneAuthIdEditTextView.id)
-
-                                setMargins((mDevWidth.toFloat() * signup_sub_parent_input_editTextView_marginLeft).toInt(),0,0, 0)
-                            }
-                    }
-
-                    findPwPhoneAuthIdButtonView.apply {
-                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * passwordAuth_confirm_button_scaleX).toInt(), (mDevHeight.toFloat() * passwordAuth_confirm_button_scaleY).toInt())
-                            .apply {
-                                addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE)
-                                addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
-                                setMargins(0,0,0,(mDevHeight.toFloat() * signup_sub_parent_input_view_marginBottom).toInt())
-
-                                if(passwordAuth_confirm_button_background_resource != DATA_NONE) backgroundResource = passwordAuth_confirm_button_background_resource
-                                else if(passwordAuth_confirm_button_background_color != DATA_NONE) backgroundColor = passwordAuth_confirm_button_background_color
-
-                                text = passwordAuth_confirm_button_text_value
-                                textSize = passwordAuth_confirm_button_text_size
-                                textColor = passwordAuth_confirm_button_text_color
-                            }
-
-                        setOnClickListener {
-//                            viewModel.onSignUpPhoneAuthConfirmButtonClick(findPhoneAuthIdEditTextView.text.toString())
-                        }
-                    }
-
-                    findPwPhoneAuthIdUnderBarView.apply {
-                        if(!init.use_under_bar) visibility = View.GONE
-
-                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * signup_sub_parent_input_scaleX).toInt() - (mDevWidth.toFloat() * init.passwordAuth_confirm_button_scaleX).toInt(), (mDevHeight.toFloat() * under_bar_height).toInt())
+                        layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * signup_sub_parent_input_scaleX).toInt(), (mDevHeight.toFloat() * under_bar_height).toInt())
                             .apply {
                                 backgroundColor = under_bar_color
 
@@ -702,7 +1103,10 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
             }
         }
 
-        /** Signup Observer */
+        /**
+         * Signup Observer
+         * 회원가입 UI
+         */
         viewModel.observerSignUpSettings = object : Observer<Void> {
             var dispose: Disposable? = null
 
@@ -1171,7 +1575,7 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
                                                             }
 
                                                         setOnClickListener {
-                                                            viewModel.requestPhoneAuth(sub_parent_input_editTextView_phone.text.toString(), auth_time)
+                                                            viewModel.requestPhoneAuth(sub_parent_input_editTextView_phone.text.toString(), auth_time, 0)
                                                         }
                                                     }
                                                 }
@@ -1268,7 +1672,7 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
                                                             }
 
                                                         setOnClickListener {
-                                                            viewModel.onSignUpPhoneAuthConfirmButtonClick(sub_parent_input_editTextView_phone_auth.text.toString())
+                                                            viewModel.onSignUpPhoneAuthConfirmButtonClick(sub_parent_input_editTextView_phone_auth.text.toString(), 0)
                                                         }
                                                     }
                                                 }
@@ -1647,7 +2051,10 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
             override fun onError(e: Throwable) {}
         }
 
-        /** Find Id/Password Observer */
+        /**
+         * Find Id/Password Observer
+         * 아이디/비밀번호 찾기 UI
+         */
         viewModel.observerFindIdPwSettings = object : Observer<Void> {
             var dispose: Disposable? = null
 
@@ -1662,7 +2069,7 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
                     text = init.login_sub_parent_2_info_group_findPW_text
 
                     setOnTouchListener(getViewUtil()?.getAnimatingTouchlistener(ViewUtil.ANIMATION_SMALL_BUTTON__CLICK) {
-                        when(init.find_IdPw_view_type) {
+                        when(init.find_id_view_type) {
                             init.TYPE_A -> {
                                 getViewUtil()?.addView("findIdPw", init.getFindIdPw(mContext), ViewUtil.ANIMATION_FADE_IN, ViewUtil.ANIMATION_FADE_OUT, object : ViewUtil.addViewInitListener {
                                     override fun onCreateView(p0: View?) {
@@ -1680,8 +2087,8 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
                                                         isClickable = true
                                                     }
 
-                                                if(find_IdPw_background != DATA_NONE)         backgroundResource = find_IdPw_background
-                                                if(find_IdPw_backgroundColor != DATA_NONE)    backgroundColor = find_IdPw_backgroundColor
+                                                if(find_id_pw_background != DATA_NONE)         backgroundResource = find_id_pw_background
+                                                if(find_id_pw_backgroundColor != DATA_NONE)    backgroundColor = find_id_pw_backgroundColor
                                             }
 
                                             // Title TextView Settings
@@ -1692,8 +2099,8 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
                                             init.apply {
                                                 layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
 
-                                                if(find_IdPw_sub_parent_background != DATA_NONE) backgroundResource = find_IdPw_sub_parent_background
-                                                if(find_IdPw_sub_parent_backgroundColor != DATA_NONE) backgroundColor = find_IdPw_sub_parent_backgroundColor
+                                                if(find_id_pw_sub_parent_background != DATA_NONE) backgroundResource = find_id_pw_sub_parent_background
+                                                if(find_id_pw_sub_parent_backgroundColor != DATA_NONE) backgroundColor = find_id_pw_sub_parent_backgroundColor
 
                                                 val viewPagerDataList01 = arrayListOf(0, 1) as ArrayList<Int>
 
@@ -1702,13 +2109,13 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
                                                     override fun onCreate(type: Int): RecyclerView.ViewHolder {
                                                         when(type) {
                                                             0 -> {
-                                                                return FindIdViewHolder(init.getFindIdAdapterItem(mContext))
+                                                                return FindIdViewHolderTypeA(init.getFindIdAdapterItem(mContext))
                                                             }
                                                             1 -> {
-                                                                return FindPwViewHolder(init.getFindPwAdapterItem(mContext))
+                                                                return FindPwViewHolderTypeA(init.getFindPwAdapterItem(mContext))
                                                             }
                                                             else -> {
-                                                                return FindIdViewHolder(init.getFindIdAdapterItem(mContext))
+                                                                return FindIdViewHolderTypeA(init.getFindIdAdapterItem(mContext))
                                                             }
                                                         }
                                                     }
@@ -1726,8 +2133,8 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
 
                                                 // tab layout
                                                 find_IdPw_contentView_Type_A_sub_parent_tablayout.apply {
-                                                    setSelectedTabIndicatorColor(find_IdPw_sub_parent_indicator_color)
-                                                    setTabTextColors(find_IdPw_sub_parent_unselected_color, find_IdPw_sub_parent_selected_color)
+                                                    setSelectedTabIndicatorColor(find_id_pw_sub_parent_indicator_color)
+                                                    setTabTextColors(find_id_pw_sub_parent_unselected_color, find_id_pw_sub_parent_selected_color)
                                                 }
 
                                                 TabLayoutMediator(find_IdPw_contentView_Type_A_sub_parent_tablayout, find_IdPw_contentView_Type_A_sub_parent_viewpager2, true) { tab, position ->
@@ -1748,226 +2155,101 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
                                     private fun setFindIdPWParentTitle() {
                                         init.apply {
                                             find_IdPw_contentView_Type_A_main_parent_textView_title.apply {
-                                                layoutParams = LinearLayout.LayoutParams((mDevWidth.toFloat() * find_IdPw_title_text_scaleX).toInt(), (mDevHeight.toFloat() * find_IdPw_title_text_scaleY).toInt())
+                                                layoutParams = LinearLayout.LayoutParams((mDevWidth.toFloat() * find_id_pw_title_text_scaleX).toInt(), (mDevHeight.toFloat() * find_id_pw_title_text_scaleY).toInt())
 
-                                                text = find_IdPw_title_text_value
-                                                textColor = find_IdPw_title_text_color
-                                                textSize = find_IdPw_title_text_size
+                                                text = find_id_pw_title_text_value
+                                                textColor = find_id_pw_title_text_color
+                                                textSize = find_id_pw_title_text_size
                                                 gravity = Gravity.CENTER
-                                                translationX = (mDevWidth.toFloat() * find_IdPw_title_text_positionX)
-                                                translationY = (mDevHeight.toFloat() * find_IdPw_title_text_positionY)
+                                                translationX = (mDevWidth.toFloat() * find_id_pw_title_text_positionX)
+                                                translationY = (mDevHeight.toFloat() * find_id_pw_title_text_positionY)
                                             }
                                         }
                                     }
 
-                                    /**
-                                     * "휴대폰" 번호 입력
-                                     * @param use 사용 true or false
-                                     * @param useAuth 휴대폰 인증 기능 사용 true or false
-                                     */
-                                    private fun setFindPhoneItem(use: Boolean, useAuth: Boolean) {
-                                        var sub_parent_input_phone: RelativeLayout = init.find_id_view_type_a_sub_parent_input_phone
-                                        var sub_parent_input_imageView_phone: ImageView = init.find_id_view_type_a_sub_parent_input_imageView_phone
-                                        var sub_parent_input_editTextView_phone: EditText = init.find_id_view_type_a_sub_parent_input_editTextView_phone
-                                        var sub_parent_input_view_phone: View = init.find_id_view_type_a_sub_parent_input_view_phone
-                                        var sub_parent_input_button_phone: Button = init.find_id_view_type_a_sub_parent_input_button_phone
+                                    override fun onRemove() {
 
-                                        if(!use) sub_parent_input_phone.visibility = View.GONE
-
-                                        // Sub Parent Input Layout Settings
-                                        sub_parent_input_phone.apply {
-                                            init.apply {
-                                                layoutParams = LinearLayout.LayoutParams((mDevWidth.toFloat() * signup_sub_parent_input_scaleX).toInt(), (mDevHeight.toFloat() * signup_sub_parent_input_scaleY).toInt())
-                                                    .apply {
-                                                        gravity = Gravity.CENTER_HORIZONTAL
-                                                    }
-                                            }
-
-                                            sub_parent_input_imageView_phone.apply {
-                                                init.apply {
-                                                    layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * signup_sub_parent_input_imageView_scaleX).toInt(), (mDevHeight.toFloat() * signup_sub_parent_input_imageView_scaleY).toInt())
-                                                        .apply {
-                                                            addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
-
-                                                            setImageResource(icon_phone_drawable_resource)
-                                                        }
-                                                }
-                                            }
-
-                                            sub_parent_input_editTextView_phone.apply {
-                                                init.apply {
-                                                    layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * signup_sub_parent_input_editTextView_scaleX).toInt(), (mDevHeight.toFloat() * signup_sub_parent_input_editTextView_scaleY).toInt())
-                                                        .apply {
-                                                            background = ContextCompat.getDrawable(mContext, android.R.color.transparent)
-
-                                                            hint = editText_phone_hint_value
-                                                            setHintTextColor(editText_hint_color)
-
-                                                            setTextColor(editText_text_color)
-
-                                                            maxLines = 1
-                                                            singleLine = true
-                                                            filters = arrayOf(InputFilter.LengthFilter(editText_phone_max_length))
-
-                                                            inputType = InputType.TYPE_CLASS_NUMBER
-
-                                                            addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
-
-                                                            addRule(RelativeLayout.RIGHT_OF, sub_parent_input_imageView_phone.id)
-
-                                                            setMargins((mDevWidth.toFloat() * signup_sub_parent_input_editTextView_marginLeft).toInt(),0,0, 0)
-                                                        }
-                                                }
-                                            }
-
-                                            var view_scaleX = (mDevWidth.toFloat() * init.signup_sub_parent_input_scaleX).toInt()
-
-                                            if(useAuth) {
-                                                view_scaleX -= (mDevWidth.toFloat() * init.passwordAuth_button_scaleX).toInt()
-
-                                                // show phone auth item
-                                                setFindPhoneAuthItem()
-                                            } else {
-                                                sub_parent_input_button_phone.visibility = View.GONE
-                                                init.signup_contentView_Type_A_sub_parent_input_phone_auth.visibility = View.GONE
-                                            }
-
-                                            // [인증번호 요청] 버튼
-                                            sub_parent_input_button_phone.apply {
-                                                init.apply {
-                                                    layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * passwordAuth_button_scaleX).toInt(), (mDevHeight.toFloat() * passwordAuth_button_scaleY).toInt())
-                                                        .apply {
-                                                            addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE)
-                                                            addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
-                                                            setMargins(0,0,0,(mDevHeight.toFloat() * signup_sub_parent_input_view_marginBottom).toInt())
-
-                                                            if(passwordAuth_button_background_resource != DATA_NONE) backgroundResource = passwordAuth_button_background_resource
-                                                            else if(passwordAuth_button_background_color != DATA_NONE) backgroundColor = passwordAuth_button_background_color
-
-                                                            text = passwordAuth_button_text_value
-                                                            textSize = passwordAuth_button_text_size
-                                                            textColor = passwordAuth_button_text_color
-                                                        }
-
-                                                    setOnClickListener {
-                                                        viewModel.requestPhoneAuth(sub_parent_input_editTextView_phone.text.toString(), auth_time)
-                                                    }
-                                                }
-                                            }
-
-                                            if(!init.use_under_bar) sub_parent_input_view_phone.visibility = View.GONE
-
-                                            sub_parent_input_view_phone.apply {
-                                                init.apply {
-                                                    layoutParams = RelativeLayout.LayoutParams(view_scaleX, (mDevHeight.toFloat() * under_bar_height).toInt())
-                                                        .apply {
-                                                            backgroundColor = under_bar_color
-
-                                                            addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
-
-                                                            setMargins(0,0,0,(mDevHeight.toFloat() * signup_sub_parent_input_view_marginBottom).toInt())
-                                                        }
-                                                }
-                                            }
-                                        }
                                     }
+                                })
+                            }
+                            init.TYPE_B -> {
+                                getViewUtil()?.addView("findIdPw", init.getFindIdPw(mContext), ViewUtil.ANIMATION_FADE_IN, ViewUtil.ANIMATION_FADE_OUT, object : ViewUtil.addViewInitListener {
+                                    override fun onCreateView(p0: View?) {
+                                        var parent: LinearLayout = init.find_IdPw_contentView_Type_A_main_parent
 
-                                    /** "휴대폰" 인증 기능 이용시 사용될 [인증번호 입력] */
-                                    private fun setFindPhoneAuthItem() {
-                                        var sub_parent_input_phone_auth: RelativeLayout = init.find_id_view_type_a_sub_parent_input_phone_auth
-                                        var sub_parent_input_imageView_phone_auth: ImageView = init.find_id_view_type_a_sub_parent_input_imageView_phone_auth
-                                        var sub_parent_input_editTextView_phone_auth: EditText = init.find_id_view_type_a_sub_parent_input_editTextView_phone_auth
-                                        var sub_parent_input_view_phone_auth: View = init.find_id_view_type_a_sub_parent_input_view_phone_auth
-                                        var sub_parent_input_button_phone_auth: Button = init.find_id_view_type_a_sub_parent_input_button_phone_auth
+                                        var sub_parent: LinearLayout = init.find_IdPw_contentView_Type_A_sub_parent
 
-                                        // Sub Parent Input Layout Settings
-                                        sub_parent_input_phone_auth.apply {
+                                        // Parent Layout Settings
+                                        parent.apply {
                                             init.apply {
-                                                //                                    backgroundColor = Color.RED    // 임시
-
-                                                layoutParams = LinearLayout.LayoutParams((mDevWidth.toFloat() * signup_sub_parent_input_scaleX).toInt(), (mDevHeight.toFloat() * signup_sub_parent_input_scaleY).toInt())
+                                                layoutParams = FrameLayout.LayoutParams(matchParent, matchParent)
                                                     .apply {
                                                         gravity = Gravity.CENTER_HORIZONTAL
+                                                        orientation = LinearLayout.VERTICAL
+                                                        isClickable = true
                                                     }
+
+                                                if(find_id_pw_background != DATA_NONE)         backgroundResource = find_id_pw_background
+                                                if(find_id_pw_backgroundColor != DATA_NONE)    backgroundColor = find_id_pw_backgroundColor
                                             }
 
-                                            sub_parent_input_imageView_phone_auth.apply {
-                                                init.apply {
-                                                    layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * signup_sub_parent_input_imageView_scaleX).toInt(), (mDevHeight.toFloat() * signup_sub_parent_input_imageView_scaleY).toInt())
-                                                        .apply {
-                                                            addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
+                                            // Title TextView Settings
+//                                            setFindIdPWParentTitle()
+                                        }
 
-                                                            setImageResource(icon_phoneAuth_drawable_resource)
+                                        sub_parent.apply {
+                                            init.apply {
+                                                layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
+
+                                                if(find_id_pw_sub_parent_background != DATA_NONE) backgroundResource = find_id_pw_sub_parent_background
+                                                if(find_id_pw_sub_parent_backgroundColor != DATA_NONE) backgroundColor = find_id_pw_sub_parent_backgroundColor
+
+                                                val viewPagerDataList01 = arrayListOf(0, 1) as ArrayList<Int>
+
+                                                val viewPagerDataList = arrayListOf("adapter01", "adapter02") as ArrayList<Any>
+                                                val viewPagerAdapter = UniversalRecyclerViewAdapter(viewPagerDataList, object : UniversalRecyclerViewAdapter.CreateViewListener {
+                                                    override fun onCreate(type: Int): RecyclerView.ViewHolder {
+                                                        when(type) {
+                                                            0 -> {
+                                                                return FindIdViewHolderTypeB(init.getFindIdAdpaterItem_b(mContext))
+                                                            }
+                                                            1 -> {
+                                                                return FindPwViewHolderTypeB(init.getFindPwAdapterItem_b(mContext))
+                                                            }
+                                                            else -> {
+                                                                return FindIdViewHolderTypeB(init.getFindIdAdpaterItem_b(mContext))
+                                                            }
                                                         }
-                                                }
-                                            }
-
-                                            sub_parent_input_editTextView_phone_auth.apply {
-                                                init.apply {
-                                                    layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * signup_sub_parent_input_editTextView_scaleX).toInt(), (mDevHeight.toFloat() * signup_sub_parent_input_editTextView_scaleY).toInt())
-                                                        .apply {
-                                                            background = ContextCompat.getDrawable(mContext, android.R.color.transparent)
-
-                                                            hint = editText_phoneAuth_hint_value
-                                                            setHintTextColor(editText_hint_color)
-
-                                                            setTextColor(editText_text_color)
-
-                                                            maxLines = 1
-                                                            singleLine = true
-                                                            filters = arrayOf(InputFilter.LengthFilter(editText_phoneAuth_max_length))
-
-                                                            inputType = InputType.TYPE_CLASS_NUMBER
-
-                                                            addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
-
-                                                            addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE)
-                                                            addRule(RelativeLayout.RIGHT_OF, sub_parent_input_imageView_phone_auth.id)
-
-                                                            setMargins((mDevWidth.toFloat() * signup_sub_parent_input_editTextView_marginLeft).toInt(),0,0, 0)
-                                                        }
-                                                }
-                                            }
-
-                                            // [인증번호 확인] 버튼
-                                            sub_parent_input_button_phone_auth.apply {
-                                                init.apply {
-                                                    layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * passwordAuth_confirm_button_scaleX).toInt(), (mDevHeight.toFloat() * passwordAuth_confirm_button_scaleY).toInt())
-                                                        .apply {
-                                                            addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE)
-                                                            addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
-                                                            setMargins(0,0,0,(mDevHeight.toFloat() * signup_sub_parent_input_view_marginBottom).toInt())
-
-                                                            if(passwordAuth_confirm_button_background_resource != DATA_NONE) backgroundResource = passwordAuth_confirm_button_background_resource
-                                                            else if(passwordAuth_confirm_button_background_color != DATA_NONE) backgroundColor = passwordAuth_confirm_button_background_color
-
-                                                            text = passwordAuth_confirm_button_text_value
-                                                            textSize = passwordAuth_confirm_button_text_size
-                                                            textColor = passwordAuth_confirm_button_text_color
-                                                        }
-
-                                                    setOnClickListener {
-                                                        viewModel.onSignUpPhoneAuthConfirmButtonClick(sub_parent_input_editTextView_phone_auth.text.toString())
                                                     }
+                                                }, object : UniversalRecyclerViewAdapter.BindListener {
+                                                    override fun onBind(holder: RecyclerView.ViewHolder, position: Int, type: Int, data: Any) {
+//                                                        var viewHolder = holder as FindIdViewHolder
+
+                                                    }
+                                                })
+
+                                                viewPagerAdapter.SetViewTypeLIst(viewPagerDataList01)
+
+                                                // adapter
+                                                find_IdPw_contentView_Type_A_sub_parent_viewpager2.adapter = viewPagerAdapter
+
+                                                // tab layout
+                                                find_IdPw_contentView_Type_A_sub_parent_tablayout.apply {
+                                                    setSelectedTabIndicatorColor(find_id_pw_sub_parent_indicator_color)
+                                                    setTabTextColors(find_id_pw_sub_parent_unselected_color, find_id_pw_sub_parent_selected_color)
                                                 }
-                                            }
 
-                                            if(!init.use_under_bar) sub_parent_input_view_phone_auth.visibility = View.GONE
-
-                                            sub_parent_input_view_phone_auth.apply {
-                                                init.apply {
-                                                    layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * signup_sub_parent_input_scaleX).toInt() - (mDevWidth.toFloat() * init.passwordAuth_confirm_button_scaleX).toInt(), (mDevHeight.toFloat() * under_bar_height).toInt())
-                                                        .apply {
-                                                            backgroundColor = under_bar_color
-
-                                                            addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE)
-
-                                                            setMargins(0,0,0,(mDevHeight.toFloat() * signup_sub_parent_input_view_marginBottom).toInt())
+                                                TabLayoutMediator(find_IdPw_contentView_Type_A_sub_parent_tablayout, find_IdPw_contentView_Type_A_sub_parent_viewpager2, true) { tab, position ->
+                                                    when(position) {
+                                                        0 -> {
+                                                            tab.text = "아이디 찾기"
                                                         }
-                                                }
+                                                        1 -> {
+                                                            tab.text = "비밀번호 찾기"
+                                                        }
+                                                    }
+                                                }.attach()
                                             }
-
-//                                            setPhoneAuthTimer()
                                         }
                                     }
 
@@ -1995,7 +2277,7 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
         }
 
         // 회원가입 인증번호 요청 observer
-        viewModel.observerUpdateUI = object : Observer<Boolean> {
+        viewModel.observerSignUpUpdateUI = object : Observer<Boolean> {
             var status: Boolean = false
             var dispose: Disposable? = null
 
@@ -2026,8 +2308,72 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
             override fun onError(e: Throwable) {}
         }
 
+        // 아이디 찾기 인증번호 요청 observer
+        viewModel.observerFindIdUpdateUI = object : Observer<Boolean> {
+            var status: Boolean = false
+            var dispose: Disposable? = null
+
+            override fun onSubscribe(d: Disposable) {
+                dispose = d
+            }
+
+            override fun onNext(t: Boolean) {
+                status = t
+            }
+            override fun onComplete() {
+                if(status) {
+                    init.apply {
+                        find_id_view_type_a_sub_parent_input_editTextView_phone.isEnabled = false
+                        find_id_view_type_a_sub_parent_input_button_phone.isClickable = false
+                        find_id_view_type_a_sub_parent_input_button_phone.backgroundTintList = ColorStateList.valueOf(
+                            Color.GRAY)
+                    }
+
+                    dispose?.let { it.apply {
+                        if(!isDisposed) dispose() }
+                    }
+                }
+                else {
+                    Snackbar.make(contentView!!,"휴대폰 번호를 다시 확인해 주세요", Snackbar.LENGTH_SHORT).show()
+                }
+            }
+            override fun onError(e: Throwable) {}
+        }
+
+        // 비밀번호 찾기 인증번호 요청 observer
+        viewModel.observerFindPwUpdateUI = object : Observer<Boolean> {
+            var status: Boolean = false
+            var dispose: Disposable? = null
+
+            override fun onSubscribe(d: Disposable) {
+                dispose = d
+            }
+
+            override fun onNext(t: Boolean) {
+                status = t
+            }
+            override fun onComplete() {
+                if(status) {
+                    init.apply {
+                        find_pw_view_type_a_sub_parent_input_editTextView_phone.isEnabled = false
+                        find_pw_view_type_a_sub_parent_input_button_phone.isClickable = false
+                        find_pw_view_type_a_sub_parent_input_button_phone.backgroundTintList = ColorStateList.valueOf(
+                            Color.GRAY)
+                    }
+
+                    dispose?.let { it.apply {
+                        if(!isDisposed) dispose() }
+                    }
+                }
+                else {
+                    Snackbar.make(contentView!!,"휴대폰 번호를 다시 확인해 주세요", Snackbar.LENGTH_SHORT).show()
+                }
+            }
+            override fun onError(e: Throwable) {}
+        }
+
         // 회원가입 인증 요청 타이머 observer
-        viewModel.observerTimer = object : Observer<String> {
+        viewModel.observerSignUpTimer = object : Observer<String> {
             var dispose: Disposable? = null
 
             override fun onSubscribe(d: Disposable) {
@@ -2057,6 +2403,68 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
             }
         }
 
+        // 아이디 찾기 인증 요청 타이머 observer
+        viewModel.observerFindIdTimer = object : Observer<String> {
+            var dispose: Disposable? = null
+
+            override fun onSubscribe(d: Disposable) {
+                dispose = d
+            }
+
+            override fun onComplete() {
+                init.apply {
+                    find_id_view_type_a_sub_parent_input_editTextView_phone.isEnabled = true
+                    find_id_view_type_a_sub_parent_input_button_phone.isClickable = true
+                    find_id_view_type_a_sub_parent_input_button_phone.backgroundTintList = null
+
+                    find_id_view_type_a_sub_parent_input_phone_auth_timer_textView.text = "남은 시간 0$auth_time:00"
+                }
+
+                dispose?.let { it.apply {
+                    if(!isDisposed) dispose() }
+                }
+            }
+
+            override fun onNext(t: String) {
+                init.find_id_view_type_a_sub_parent_input_phone_auth_timer_textView.text = t
+            }
+
+            override fun onError(e: Throwable) {
+
+            }
+        }
+
+        // 비밀번호 찾기 인증 요청 타이머 observer
+        viewModel.observerFindPwTimer = object : Observer<String> {
+            var dispose: Disposable? = null
+
+            override fun onSubscribe(d: Disposable) {
+                dispose = d
+            }
+
+            override fun onComplete() {
+                init.apply {
+                    find_pw_view_type_a_sub_parent_input_editTextView_phone.isEnabled = true
+                    find_pw_view_type_a_sub_parent_input_button_phone.isClickable = true
+                    find_pw_view_type_a_sub_parent_input_button_phone.backgroundTintList = null
+
+                    find_pw_view_type_a_sub_parent_input_phone_auth_timer_textView.text = "남은 시간 0$auth_time:00"
+                }
+
+                dispose?.let { it.apply {
+                    if(!isDisposed) dispose() }
+                }
+            }
+
+            override fun onNext(t: String) {
+                init.find_pw_view_type_a_sub_parent_input_phone_auth_timer_textView.text = t
+            }
+
+            override fun onError(e: Throwable) {
+
+            }
+        }
+
         // 회원가입 인증번호 확인 observer
         viewModel.observerSingUpPhoneAuthConfirm = object : Observer<Boolean> {
             var status: Boolean = false
@@ -2074,6 +2482,90 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
                     }
 
                     viewModel.disposableTimer?.let { it.apply {
+                        if(!isDisposed) dispose() }
+                    }
+
+                    disposable?.let { it.apply {
+                        if(!isDisposed) dispose() }
+                    }
+                }
+                else {
+                    Snackbar.make(contentView!!,"인증번호를 다시 확인해 주세요", Snackbar.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onSubscribe(d: Disposable) {
+                disposable = d
+            }
+
+            override fun onNext(t: Boolean) {
+                status = t
+            }
+
+            override fun onError(e: Throwable) {
+
+            }
+        }
+
+        // 아이디 찾기 인증번호 확인 observer
+        viewModel.observerFindIdPhoneAuthConfirm = object : Observer<Boolean> {
+            var status: Boolean = false
+            var disposable: Disposable? = null
+            override fun onComplete() {
+                if(status) {
+                    Snackbar.make(contentView!!,"인증번호 확인 성공", Snackbar.LENGTH_SHORT).show()
+                    init.apply {
+                        find_id_view_type_a_sub_parent_input_editTextView_phone_auth.isEnabled = false
+                        find_id_view_type_a_sub_parent_input_button_phone_auth.isClickable = false
+                        find_id_view_type_a_sub_parent_input_button_phone_auth.backgroundTintList = ColorStateList.valueOf(
+                            Color.GRAY)
+
+                        find_id_view_type_a_sub_parent_input_phone_auth_timer_textView.text = "남은 시간 0$auth_time:00"
+                    }
+
+                    viewModel.disposableFindIdTimer?.let { it.apply {
+                        if(!isDisposed) dispose() }
+                    }
+
+                    disposable?.let { it.apply {
+                        if(!isDisposed) dispose() }
+                    }
+                }
+                else {
+                    Snackbar.make(contentView!!,"인증번호를 다시 확인해 주세요", Snackbar.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onSubscribe(d: Disposable) {
+                disposable = d
+            }
+
+            override fun onNext(t: Boolean) {
+                status = t
+            }
+
+            override fun onError(e: Throwable) {
+
+            }
+        }
+
+        // 비밀번호 찾기 인증번호 확인 observer
+        viewModel.observerFindPwPhoneAuthConfirm = object : Observer<Boolean> {
+            var status: Boolean = false
+            var disposable: Disposable? = null
+            override fun onComplete() {
+                if(status) {
+                    Snackbar.make(contentView!!,"인증번호 확인 성공", Snackbar.LENGTH_SHORT).show()
+                    init.apply {
+                        find_pw_view_type_a_sub_parent_input_editTextView_phone_auth.isEnabled = false
+                        find_pw_view_type_a_sub_parent_input_button_phone_auth.isClickable = false
+                        find_pw_view_type_a_sub_parent_input_button_phone_auth.backgroundTintList = ColorStateList.valueOf(
+                            Color.GRAY)
+
+                        find_pw_view_type_a_sub_parent_input_phone_auth_timer_textView.text = "남은 시간 0$auth_time:00"
+                    }
+
+                    viewModel.disposableFindPwTimer?.let { it.apply {
                         if(!isDisposed) dispose() }
                     }
 

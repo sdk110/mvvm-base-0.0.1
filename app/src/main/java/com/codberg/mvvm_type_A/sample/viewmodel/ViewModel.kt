@@ -1,5 +1,6 @@
 package com.codberg.mvvm_type_A.sample.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.libs.cutil_kotlin.BaseKotlinViewModel
@@ -24,13 +25,24 @@ class ViewModel(private val model: networkServiece) : BaseKotlinViewModel(), Ank
     private val TAG = javaClass.simpleName
 
     val compositeDisposable = CompositeDisposable()
+    val compositeFindIdDisposable = CompositeDisposable()
+    val compositeFindPwDisposable = CompositeDisposable()
 
     var disposableTimer: Disposable? = null
-    var observerTimer: Observer<String>? = null
+    var disposableFindIdTimer: Disposable? = null
+    var disposableFindPwTimer: Disposable? = null
 
-    var observerUpdateUI: Observer<Boolean>? = null
+    var observerSignUpTimer: Observer<String>? = null
+    var observerFindIdTimer: Observer<String>? = null
+    var observerFindPwTimer: Observer<String>? = null
+
+    var observerSignUpUpdateUI: Observer<Boolean>? = null
+    var observerFindIdUpdateUI: Observer<Boolean>? = null
+    var observerFindPwUpdateUI: Observer<Boolean>? = null
 
     var observerSingUpPhoneAuthConfirm: Observer<Boolean>? = null
+    var observerFindIdPhoneAuthConfirm: Observer<Boolean>? = null
+    var observerFindPwPhoneAuthConfirm: Observer<Boolean>? = null
 
     var observerAgreementItem1: Observer<Void>? = null
     var observerAgreementItem2: Observer<Void>? = null
@@ -185,31 +197,9 @@ class ViewModel(private val model: networkServiece) : BaseKotlinViewModel(), Ank
     }
 
     /**
-     * 휴대폰 인증번호 확인에 따른 ui update 및 call request phone auth number api
-     */
-    fun onSignUpPhoneAuthConfirmButtonClick(phoneAuthNumber: String) {
-        // todo -> 휴대폰 인증 번호 확인 api
-
-        var status = !phoneAuthNumber.isNullOrBlank()
-
-        Observable.create<Boolean>{
-            it.onNext(status)
-            it.onComplete()
-        }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                { observerSingUpPhoneAuthConfirm!!.onNext(it) },
-                { observerSingUpPhoneAuthConfirm!!.onError(it) },
-                { observerSingUpPhoneAuthConfirm!!.onComplete() }
-            )
-            .apply { compositeDisposable.add(this) }
-    }
-
-    /**
      * 휴대폰 인증번호 요청에 따른 update UI, run Timer, call request phone number api
      */
-    fun requestPhoneAuth(phoneNumber: String, auth_time: Int) {
+    fun requestPhoneAuth(phoneNumber: String, auth_time: Int, type: Int) {
         var status = !phoneNumber.isNullOrBlank()
 
         // 요청 직후 UI 업데이트
@@ -220,14 +210,37 @@ class ViewModel(private val model: networkServiece) : BaseKotlinViewModel(), Ank
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
-                { observerUpdateUI!!.onNext(it) },
-                { observerUpdateUI!!.onError(it)},
                 {
-                    observerUpdateUI!!.onComplete()
-                    if(status) startRequestPhoneTimer(auth_time)
+                    when(type) {
+                        0 -> { observerSignUpUpdateUI!!.onNext(it) }
+                        1 -> { observerFindIdUpdateUI!!.onNext(it) }
+                        2 -> { observerFindPwUpdateUI!!.onNext(it) }
+                    }
+                },
+                {
+                    when(type) {
+                        0 -> { observerSignUpUpdateUI!!.onError(it) }
+                        1 -> { observerFindIdUpdateUI!!.onError(it) }
+                        2 -> { observerFindPwUpdateUI!!.onError(it) }
+                    }
+                },
+                {
+                    when(type) {
+                        0 -> { observerSignUpUpdateUI!!.onComplete() }
+                        1 -> { observerFindIdUpdateUI!!.onComplete() }
+                        2 -> { observerFindPwUpdateUI!!.onComplete() }
+                    }
+
+                    if(status) startRequestPhoneTimer(auth_time, type)
                 }
             )
-            .apply { compositeDisposable.add(this) }
+            .apply {
+                when(type) {
+                    0 -> { compositeDisposable.add(this) }
+                    1 -> { compositeFindIdDisposable.add(this) }
+                    2 -> { compositeFindPwDisposable.add(this) }
+                }
+            }
 
         // todo -> 휴대폰 번호 인증 요청
     }
@@ -235,38 +248,102 @@ class ViewModel(private val model: networkServiece) : BaseKotlinViewModel(), Ank
     /**
      * 휴대폰 인증번호 요청 시간 타이머
      */
-    private fun startRequestPhoneTimer(auth_time: Int) {
+    private fun startRequestPhoneTimer(auth_time: Int, type: Int) {
         var minit = auth_time - 1
         var second = 60
 
-        disposableTimer = Observable.interval(1, TimeUnit.SECONDS).take((60 * auth_time).toLong())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .subscribe(
-                {
-                    if(second == 0) {
-                        minit--
-                        second = 59
-                    }
-                    else {
-                        second--
-                    }
+        when(type) {
+            0 -> {
+                disposableTimer = Observable.interval(1, TimeUnit.SECONDS).take((60 * auth_time).toLong())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(
+                        {
+                            if(second == 0) {
+                                minit--
+                                second = 59
+                            }
+                            else {
+                                second--
+                            }
 
-                    if(second == 59) observerTimer?.onNext("남은 시간 0$minit:$second")
-                    else {
-                        if(second < 10) observerTimer?.onNext("남은 시간 0$minit:0$second")
-                        else observerTimer?.onNext("남은 시간 0$minit:$second")
-                    }
-                },
-                { error ->
-                    observerTimer!!.onError(error)
-                },
-                {
-                    observerTimer?.let {
-                        it.onComplete()
-                    }
-                }
-            ).apply { compositeDisposable.add(this) }
+                            if(second == 59) observerSignUpTimer?.onNext("남은 시간 0$minit:$second")
+                            else {
+                                if(second < 10) observerSignUpTimer?.onNext("남은 시간 0$minit:0$second")
+                                else observerSignUpTimer?.onNext("남은 시간 0$minit:$second")
+                            }
+                        },
+                        { error ->
+                            observerSignUpTimer!!.onError(error)
+                        },
+                        {
+                            observerSignUpTimer?.let {
+                                it.onComplete()
+                            }
+                        }
+                    ).apply { compositeDisposable.add(this) }
+            }
+            1 -> {
+                disposableFindIdTimer = Observable.interval(1, TimeUnit.SECONDS).take((60 * auth_time).toLong())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(
+                        {
+                            if(second == 0) {
+                                minit--
+                                second = 59
+                            }
+                            else {
+                                second--
+                            }
+
+                            if(second == 59) observerFindIdTimer?.onNext("남은 시간 0$minit:$second")
+                            else {
+                                if(second < 10) observerFindIdTimer?.onNext("남은 시간 0$minit:0$second")
+                                else observerFindIdTimer?.onNext("남은 시간 0$minit:$second")
+                            }
+                        },
+                        { error ->
+                            observerFindIdTimer!!.onError(error)
+                        },
+                        {
+                            observerFindIdTimer?.let {
+                                it.onComplete()
+                            }
+                        }
+                    ).apply { compositeFindIdDisposable.add(this) }
+            }
+            2 -> {
+                disposableFindPwTimer = Observable.interval(1, TimeUnit.SECONDS).take((60 * auth_time).toLong())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(
+                        {
+                            if(second == 0) {
+                                minit--
+                                second = 59
+                            }
+                            else {
+                                second--
+                            }
+
+                            if(second == 59) observerFindPwTimer?.onNext("남은 시간 0$minit:$second")
+                            else {
+                                if(second < 10) observerFindPwTimer?.onNext("남은 시간 0$minit:0$second")
+                                else observerFindPwTimer?.onNext("남은 시간 0$minit:$second")
+                            }
+                        },
+                        { error ->
+                            observerFindPwTimer!!.onError(error)
+                        },
+                        {
+                            observerFindPwTimer?.let {
+                                it.onComplete()
+                            }
+                        }
+                    ).apply { compositeFindPwDisposable.add(this) }
+            }
+        }
     }
     
     //메인화면 뷰페이저
@@ -285,5 +362,76 @@ class ViewModel(private val model: networkServiece) : BaseKotlinViewModel(), Ank
         )
         .apply { compositeDisposable.add(this) }
 
+    }
+
+    // 아이디 찾기 휴대폰 입력 EditText after changed
+    fun findIdPhoneEditTextAfterChanged(inputText: String) {
+        Log.e("steve", "input text : $inputText")
+    }
+
+    // 아이디 찾기 Main Button
+    fun findIdButton() {
+        Log.e("steve", "onClick Find ID")
+    }
+
+    // 비밀번호 찾기 id or email 입력 EditText after chaned
+    fun findPwEmailEditTextAfterChanged(inputText: String) {
+        Log.e("steve", "input text : $inputText")
+    }
+
+    // 비밀번호 찾기 휴대폰 입력 EditText after changed
+    fun findPwPhoneEditTextAfterChanged(inputText: String) {
+        Log.e("steve", "input text : $inputText")
+    }
+
+    // 비밀번호 찾기 Main Button
+    fun findPwButton() {
+        Log.e("steve", "onClick Find PW")
+    }
+
+    /**
+     * 휴대폰 인증번호 확인에 따른 ui update 및 call request phone auth number api
+     */
+    fun onSignUpPhoneAuthConfirmButtonClick(phoneAuthNumber: String, type: Int) {
+        // todo -> 휴대폰 인증 번호 확인 api
+
+        var status = !phoneAuthNumber.isNullOrBlank()
+
+        Observable.create<Boolean>{
+            it.onNext(status)
+            it.onComplete()
+        }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                {
+                    when(type) {
+                        0 -> { observerSingUpPhoneAuthConfirm!!.onNext(it) }
+                        1 -> { observerFindIdPhoneAuthConfirm!!.onNext(it) }
+                        2 -> { observerFindPwPhoneAuthConfirm!!.onNext(it) }
+                    }
+                },
+                {
+                    when(type) {
+                        0 -> { observerSingUpPhoneAuthConfirm!!.onError(it) }
+                        1 -> { observerFindIdPhoneAuthConfirm!!.onError(it) }
+                        2 -> { observerFindPwPhoneAuthConfirm!!.onError(it) }
+                    }
+                },
+                {
+                    when(type) {
+                        0 -> { observerSingUpPhoneAuthConfirm!!.onComplete() }
+                        1 -> { observerFindIdPhoneAuthConfirm!!.onComplete() }
+                        2 -> { observerFindPwPhoneAuthConfirm!!.onComplete() }
+                    }
+                }
+            )
+            .apply {
+                when(type) {
+                    0 -> { compositeDisposable.add(this) }
+                    1 -> { compositeFindIdDisposable.add(this) }
+                    2 -> { compositeFindPwDisposable.add(this) }
+                }
+            }
     }
 }
