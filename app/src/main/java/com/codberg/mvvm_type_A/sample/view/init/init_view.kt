@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.view.Gravity
 import android.view.View
 import android.view.ViewManager
+import android.webkit.WebView
 import android.widget.*
 import androidx.viewpager2.widget.ViewPager2
 import com.codberg.mvvm_type_A.R
@@ -92,7 +93,7 @@ class init_view(val viewModel: ViewModel): init_data() {
                         }
                         login_Type_A_sub_parent_2_info_group_space   = imageView{ }
                         login_Type_A_sub_parent_2_info_group_find_pw = textView {
-                            viewModel.setFindPwSettings()
+                            viewModel.setFindIdPwSettings()
                         }
                     }.lparams(matchParent, wrapContent)
                     login_Type_A_sub_parent_2_text2 = textView { }
@@ -269,6 +270,253 @@ class init_view(val viewModel: ViewModel): init_data() {
     }
 
     /**----------------------------------------------------------------**/
+    lateinit var signup_contentView_type_A_main_linearLayout: LinearLayout
+    lateinit var signup_contentView_type_A_linearLayout: LinearLayout
+    lateinit var signup_contentView_Type_A_webView: WebView
+
+    fun createTermsWebView(mContext: Context): View {
+        return mContext.UI {
+            signup_contentView_type_A_main_linearLayout = linearLayout {
+                isClickable = true
+                gravity = Gravity.CENTER
+                backgroundColor = Color.parseColor("#CC000000")
+                signup_contentView_type_A_linearLayout = linearLayout {
+                    signup_contentView_Type_A_webView = webView {  }
+                }
+            }
+        }.view
+    }
+
+    /** [Find Id and Password] --------------------------------------------- **/
+
+    lateinit var find_IdPw_contentView_Type_A_main_parent: LinearLayout
+    lateinit var find_IdPw_contentView_Type_A_main_parent_textView_title: TextView
+
+    lateinit var find_IdPw_contentView_Type_A_sub_parent: LinearLayout
+    lateinit var find_IdPw_contentView_Type_A_sub_parent_viewpager2: ViewPager2
+    lateinit var find_IdPw_contentView_Type_A_sub_parent_tablayout: TabLayout
+
+    fun getFindIdPw(mCon: Context): View {
+        return mCon.UI {
+            find_IdPw_contentView_Type_A_main_parent = linearLayout {
+                find_IdPw_contentView_Type_A_main_parent_textView_title = textView {  }
+
+                find_IdPw_contentView_Type_A_sub_parent = verticalLayout {
+                    find_IdPw_contentView_Type_A_sub_parent_tablayout = tabLayout {
+                        layoutParams = LinearLayout.LayoutParams(matchParent, wrapContent)
+                    }
+                    find_IdPw_contentView_Type_A_sub_parent_viewpager2 = viewPager2 {
+                        layoutParams = LinearLayout.LayoutParams(matchParent, matchParent)
+                    }
+                }
+            }
+        }.view
+    }
+
+    lateinit var find_id_view_type_a_adapter_main_parent: LinearLayout
+
+    lateinit var find_id_view_type_a_sub_parent_input_phone: RelativeLayout
+    lateinit var find_id_view_type_a_sub_parent_input_imageView_phone: ImageView
+    lateinit var find_id_view_type_a_sub_parent_input_editTextView_phone: EditText
+    lateinit var find_id_view_type_a_sub_parent_input_view_phone: View
+    lateinit var find_id_view_type_a_sub_parent_input_button_phone: Button
+
+    lateinit var find_id_view_type_a_sub_parent_input_phone_auth: RelativeLayout
+    lateinit var find_id_view_type_a_sub_parent_input_imageView_phone_auth: ImageView
+    lateinit var find_id_view_type_a_sub_parent_input_editTextView_phone_auth: EditText
+    lateinit var find_id_view_type_a_sub_parent_input_view_phone_auth: View
+    lateinit var find_id_view_type_a_sub_parent_input_button_phone_auth: Button
+
+    lateinit var find_id_view_type_a_sub_parent_input_phone_auth_timer_layout: RelativeLayout
+    lateinit var find_id_view_type_a_sub_parent_input_phone_auth_timer_textView: TextView
+
+    lateinit var find_id_view_type_a_sub_parent_input_find_button_layout: LinearLayout
+    lateinit var find_id_view_type_a_sub_parent_input_find_button: Button
+
+    fun getFindIdAdapterItem(mCon: Context): View {
+        return mCon.UI {
+            find_id_view_type_a_adapter_main_parent = linearLayout {
+
+                // Find ID phone
+                find_id_view_type_a_sub_parent_input_phone = relativeLayout {
+                    find_id_view_type_a_sub_parent_input_imageView_phone = imageView { }
+                    find_id_view_type_a_sub_parent_input_editTextView_phone = editText { }
+                    find_id_view_type_a_sub_parent_input_view_phone = view { }
+                    find_id_view_type_a_sub_parent_input_button_phone = button { }
+                }
+
+                // Find ID phone auth
+                find_id_view_type_a_sub_parent_input_phone_auth = relativeLayout {
+                    find_id_view_type_a_sub_parent_input_imageView_phone_auth = imageView { }
+                    find_id_view_type_a_sub_parent_input_editTextView_phone_auth = editText { }
+                    find_id_view_type_a_sub_parent_input_view_phone_auth = view { }
+                    find_id_view_type_a_sub_parent_input_button_phone_auth = button { }
+                }
+
+                // Find ID phone auth timer
+                find_id_view_type_a_sub_parent_input_phone_auth_timer_layout = relativeLayout {
+                    find_id_view_type_a_sub_parent_input_phone_auth_timer_textView = textView {  }
+                }
+
+                // Find ID Find Button
+                find_id_view_type_a_sub_parent_input_find_button_layout = verticalLayout {
+                    find_id_view_type_a_sub_parent_input_find_button = button {  }
+                }
+            }
+        }.view
+    }
+
+    lateinit var find_id_view_type_b_adapater_main_parent: LinearLayout
+    lateinit var find_id_view_type_b_sub_parent_input_phone: RelativeLayout
+    lateinit var find_id_view_type_b_sub_parent_input_imageView_phone: ImageView
+    lateinit var find_id_view_type_b_sub_parent_input_editTextView_phone: EditText
+    lateinit var find_id_view_type_b_sub_parent_input_view_phone: View
+
+    lateinit var find_id_view_type_b_sub_parent_input_find_button_layout: LinearLayout
+    lateinit var find_id_view_type_b_sub_parent_input_find_button: Button
+
+    fun getFindIdAdpaterItem_b(mContext: Context): View {
+        return mContext.UI {
+            find_id_view_type_b_adapater_main_parent = linearLayout {
+                // Find ID phone
+                find_id_view_type_b_sub_parent_input_phone = relativeLayout {
+                    find_id_view_type_b_sub_parent_input_imageView_phone = imageView { }
+                    find_id_view_type_b_sub_parent_input_editTextView_phone = editText { }
+                    find_id_view_type_b_sub_parent_input_view_phone = view { }
+                }
+
+                // Find ID Button
+                find_id_view_type_b_sub_parent_input_find_button_layout = verticalLayout {
+                    find_id_view_type_b_sub_parent_input_find_button = button {  }
+                }
+            }
+        }.view
+    }
+
+
+    lateinit var find_pw_view_type_a_adapter_main_parent: LinearLayout
+
+    lateinit var find_pw_view_type_a_sub_parent_input_id_email: RelativeLayout
+    lateinit var find_pw_view_type_a_sub_parent_input_imageView_id_email: ImageView
+    lateinit var find_pw_view_type_a_sub_parent_input_editTextView_id_email: EditText
+    lateinit var find_pw_view_type_a_sub_parent_input_view_id_email: View
+
+    lateinit var find_pw_view_type_a_sub_parent_input_phone: RelativeLayout
+    lateinit var find_pw_view_type_a_sub_parent_input_imageView_phone: ImageView
+    lateinit var find_pw_view_type_a_sub_parent_input_editTextView_phone: EditText
+    lateinit var find_pw_view_type_a_sub_parent_input_view_phone: View
+    lateinit var find_pw_view_type_a_sub_parent_input_button_phone: Button
+
+    lateinit var find_pw_view_type_a_sub_parent_input_phone_auth: RelativeLayout
+    lateinit var find_pw_view_type_a_sub_parent_input_imageView_phone_auth: ImageView
+    lateinit var find_pw_view_type_a_sub_parent_input_editTextView_phone_auth: EditText
+    lateinit var find_pw_view_type_a_sub_parent_input_view_phone_auth: View
+    lateinit var find_pw_view_type_a_sub_parent_input_button_phone_auth: Button
+
+    lateinit var find_pw_view_type_a_sub_parent_input_phone_auth_timer_layout: RelativeLayout
+    lateinit var find_pw_view_type_a_sub_parent_input_phone_auth_timer_textView: TextView
+
+    lateinit var find_pw_view_type_a_sub_parent_input_find_button_layout: LinearLayout
+    lateinit var find_pw_view_type_a_sub_parent_input_find_button: Button
+
+    fun getFindPwAdapterItem(mCon: Context): View {
+        return mCon.UI {
+            find_pw_view_type_a_adapter_main_parent = linearLayout {
+
+                // Find Id or Email phone
+                find_pw_view_type_a_sub_parent_input_id_email = relativeLayout {
+                    find_pw_view_type_a_sub_parent_input_imageView_id_email = imageView { }
+                    find_pw_view_type_a_sub_parent_input_editTextView_id_email = editText { }
+                    find_pw_view_type_a_sub_parent_input_view_id_email = view { }
+                }
+
+                // Find PW phone
+                find_pw_view_type_a_sub_parent_input_phone = relativeLayout {
+                    find_pw_view_type_a_sub_parent_input_imageView_phone = imageView { }
+                    find_pw_view_type_a_sub_parent_input_editTextView_phone = editText { }
+                    find_pw_view_type_a_sub_parent_input_view_phone = view { }
+                    find_pw_view_type_a_sub_parent_input_button_phone = button { }
+                }
+
+                // Find PW phone auth
+                find_pw_view_type_a_sub_parent_input_phone_auth = relativeLayout {
+                    find_pw_view_type_a_sub_parent_input_imageView_phone_auth = imageView { }
+                    find_pw_view_type_a_sub_parent_input_editTextView_phone_auth = editText { }
+                    find_pw_view_type_a_sub_parent_input_view_phone_auth = view { }
+                    find_pw_view_type_a_sub_parent_input_button_phone_auth = button { }
+                }
+
+                // Find PW phone auth timer
+                find_pw_view_type_a_sub_parent_input_phone_auth_timer_layout = relativeLayout {
+                    find_pw_view_type_a_sub_parent_input_phone_auth_timer_textView = textView {  }
+                }
+
+                // Find PW Button
+                find_pw_view_type_a_sub_parent_input_find_button_layout = verticalLayout {
+                    find_pw_view_type_a_sub_parent_input_find_button = button {  }
+                }
+            }
+        }.view
+    }
+
+    lateinit var find_pw_view_type_b_adapter_main_parent: LinearLayout
+
+    lateinit var find_pw_view_type_b_sub_parent_input_id_email: RelativeLayout
+    lateinit var find_pw_view_type_b_sub_parent_input_imageView_id_email: ImageView
+    lateinit var find_pw_view_type_b_sub_parent_input_editTextView_id_email: EditText
+    lateinit var find_pw_view_type_b_sub_parent_input_view_id_email: View
+
+    lateinit var find_pw_view_type_b_sub_parent_input_phone: RelativeLayout
+    lateinit var find_pw_view_type_b_sub_parent_input_imageView_phone: ImageView
+    lateinit var find_pw_view_type_b_sub_parent_input_editTextView_phone: EditText
+    lateinit var find_pw_view_type_b_sub_parent_input_view_phone: View
+
+    lateinit var find_pw_view_type_b_sub_parent_input_find_button_layout: LinearLayout
+    lateinit var find_pw_view_type_b_sub_parent_input_find_button: Button
+
+    fun getFindPwAdapterItem_b(mCon: Context): View {
+        return mCon.UI {
+            find_pw_view_type_b_adapter_main_parent = linearLayout {
+
+                // Find Id or Email phone
+                find_pw_view_type_b_sub_parent_input_id_email = relativeLayout {
+                    find_pw_view_type_b_sub_parent_input_imageView_id_email = imageView { }
+                    find_pw_view_type_b_sub_parent_input_editTextView_id_email = editText { }
+                    find_pw_view_type_b_sub_parent_input_view_id_email = view { }
+                }
+
+                // Find PW phone
+                find_pw_view_type_b_sub_parent_input_phone = relativeLayout {
+                    find_pw_view_type_b_sub_parent_input_imageView_phone = imageView { }
+                    find_pw_view_type_b_sub_parent_input_editTextView_phone = editText { }
+                    find_pw_view_type_b_sub_parent_input_view_phone = view { }
+                }
+
+                // Find PW Button
+                find_pw_view_type_b_sub_parent_input_find_button_layout = verticalLayout {
+                    find_pw_view_type_b_sub_parent_input_find_button = button {  }
+                }
+            }
+        }.view
+    }
+
+    inline fun ViewManager.viewPager2(theme: Int = 0, init: ViewPager2.() -> Unit) = ankoView({
+        ViewPager2(it)
+    }, theme, init)
+    inline fun ViewManager.tabLayout(theme: Int = R.style.AppTheme, init: TabLayout.() -> Unit) = ankoView({ TabLayout(it) }, theme, init)
+
+    // [Auth Code]
+    lateinit var find_view_type_b_auth_code_main_parent: LinearLayout
+
+    fun getAuthCodeView(mContext: Context): View {
+        return mContext.UI {
+            find_view_type_b_auth_code_main_parent = linearLayout {
+
+            }
+        }.view
+    }
+
+    /** -------------------------------------------------------------------- **/
 
     /** [main] ----------------------------------------------**/
     lateinit var main_parrent : FrameLayout
