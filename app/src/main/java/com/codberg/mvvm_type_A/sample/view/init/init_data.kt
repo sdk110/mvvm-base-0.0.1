@@ -3,6 +3,7 @@ package com.codberg.mvvm_type_A.sample.view.init
 import android.graphics.Color
 import android.graphics.Typeface
 import com.codberg.mvvm_type_A.R
+import com.codberg.mvvm_type_A.sample.etc.Utils
 import com.codberg.mvvm_type_A.sample.model.request.request_testApi
 
 open class init_data {
@@ -246,6 +247,9 @@ open class init_data {
     // Sign Up Layout Type
     var signup_view_type = TYPE_A // TYPE-A, customView
     var signup_anmation_type = CUSTOM // TYPE-A, customView
+
+//    var signup_terms_type = Utils.EnumTermsType.EXTERNAL
+    var signup_terms_type = Utils.EnumTermsType.INTERNAL
 
     // Parent Layout
     var signup_background = DATA_NONE
@@ -523,6 +527,8 @@ open class init_data {
     // FIND PW - UI Type
     var find_pw_view_type = TYPE_A
 
+    var find_pw_type_id_email = Utils.EnumInputType.EMAIL
+
     // FIND PW - 맨 처음 Top Margin(높이) 값
     var find_pw_main_parent_layout_margin_top = 0.1f
 
@@ -542,7 +548,7 @@ open class init_data {
     var find_pw_IdEmail_edittext_scaleX = 0.9f
     var find_pw_IdEmail_edittext_scaleY = 0.08f
     var find_pw_IdEmail_edittext_marginLeft = 0.1f                                    // icon과 EditText 사이 간격
-    var find_pw_IdEmail_edittext_max_length = 20                                      // EditText Max Length
+    var find_pw_IdEmail_edittext_max_length = 40                                      // EditText Max Length
     var find_pw_IdEmail_edittext_text_color = Color.parseColor("#2e2e2e")   // EditText Text Color
     var find_pw_IdEmail_edittext_hint_value = "아이디 or 이메일"                              // EditText Hint Value
     var find_pw_IdEmail_edittext_hint_color = Color.parseColor("#902e2e2e") // EditText Hint Color

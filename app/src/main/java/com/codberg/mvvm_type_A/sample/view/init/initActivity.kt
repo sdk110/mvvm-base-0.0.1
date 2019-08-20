@@ -3,15 +3,14 @@ package com.codberg.mvvm_type_A.sample.view.init
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.net.Uri
 import com.codberg.mvvm_type_A.sample.view.MainViewManager
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.InputFilter
-import android.text.InputType
-import android.text.TextWatcher
+import android.text.*
 import android.view.Gravity
 import android.view.View
 import android.widget.*
@@ -19,7 +18,7 @@ import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
 import androidx.interpolator.view.animation.FastOutLinearInInterpolator
 import androidx.recyclerview.widget.RecyclerView
-import com.codberg.mvvm_type_A.R
+import com.codberg.mvvm_type_A.sample.etc.Utils
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import com.codberg.mvvm_type_A.sample.viewmodel.ViewModel
 import com.google.android.material.snackbar.Snackbar
@@ -30,6 +29,11 @@ import io.reactivex.Observer
 import io.reactivex.disposables.Disposable
 import org.jetbrains.anko.*
 import org.jetbrains.anko.sdk27.coroutines.onCheckedChange
+import android.text.InputFilter
+import android.text.method.PasswordTransformationMethod
+import android.webkit.WebViewClient
+import com.codberg.mvvm_type_A.R
+
 
 open class initActivity : BaseKotlinActivity<ViewModel>() {
     lateinit var initViewManager : MainViewManager
@@ -566,6 +570,7 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
                                 textSize = find_pw_find_button_text_size
 
                                 setOnClickListener {
+                                    Toast.makeText(mContext, "${Utils.isValidateEmail(findPwInputIdEmailEditTextView.text.toString())}", Toast.LENGTH_SHORT).show()
                                     viewModel.findPwButton()
                                 }
                             }
@@ -590,7 +595,18 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
                             .apply {
                                 background = ContextCompat.getDrawable(mContext, android.R.color.transparent)
 
-                                hint = find_pw_IdEmail_edittext_hint_value
+                                when(find_pw_type_id_email) {
+                                    Utils.EnumInputType.ID -> {
+                                        hint = "아이디"
+                                        inputType = InputType.TYPE_CLASS_TEXT
+                                        privateImeOptions = "defaultInputmode=english"
+                                    }
+                                    Utils.EnumInputType.EMAIL -> {
+                                        hint = "이메일"
+                                        inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+                                    }
+                                }
+
                                 setHintTextColor(find_pw_IdEmail_edittext_hint_color)
 
                                 setTextColor(find_pw_IdEmail_edittext_text_color)
@@ -599,7 +615,7 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
                                 singleLine = true
                                 filters = arrayOf(InputFilter.LengthFilter(find_pw_IdEmail_edittext_max_length))
 
-                                inputType = InputType.TYPE_CLASS_NUMBER
+                                inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
 
                                 addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE)
 
@@ -607,6 +623,11 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
 
                                 setMargins((mDevWidth.toFloat() * find_pw_IdEmail_edittext_marginLeft).toInt(),0,0, 0)
                             }
+
+                        filters = when(find_pw_type_id_email) {
+                            Utils.EnumInputType.EMAIL -> { arrayOf(Utils.onlyInputEnglishAndEmailInputFilter()) }
+                            else -> { arrayOf() }
+                        }
 
                         addTextChangedListener(object : TextWatcher {
                             override fun afterTextChanged(editable: Editable?) {
@@ -1227,7 +1248,18 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
                                                             .apply {
                                                                 background = ContextCompat.getDrawable(mContext, android.R.color.transparent)
 
-                                                                hint = editText_idEmail_hint_value
+                                                                when(find_pw_type_id_email) {
+                                                                    Utils.EnumInputType.ID -> {
+                                                                        hint = "아이디"
+                                                                        inputType = InputType.TYPE_CLASS_TEXT
+                                                                        privateImeOptions = "defaultInputmode=english"
+                                                                    }
+                                                                    Utils.EnumInputType.EMAIL -> {
+                                                                        hint = "이메일"
+                                                                        inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+                                                                    }
+                                                                }
+
                                                                 setHintTextColor(editText_hint_color)
 
                                                                 setTextColor(editText_text_color)
@@ -1243,6 +1275,11 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
 
                                                                 setMargins((mDevWidth.toFloat() * signup_sub_parent_input_editTextView_marginLeft).toInt(),0,0, 0)
                                                             }
+                                                    }
+
+                                                    filters = when(find_pw_type_id_email) {
+                                                        Utils.EnumInputType.EMAIL -> { arrayOf(Utils.onlyInputEnglishAndEmailInputFilter()) }
+                                                        else -> { arrayOf() }
                                                     }
                                                 }
 
@@ -1301,6 +1338,9 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
                                                             .apply {
                                                                 background = ContextCompat.getDrawable(mContext, android.R.color.transparent)
 
+                                                                inputType = InputType.TYPE_CLASS_TEXT
+                                                                privateImeOptions = "defaultInputmode=english"
+
                                                                 hint = editText_password_hint_value
                                                                 setHintTextColor(editText_hint_color)
 
@@ -1318,6 +1358,7 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
                                                                 setMargins((mDevWidth.toFloat() * signup_sub_parent_input_editTextView_marginLeft).toInt(),0,0, 0)
                                                             }
                                                     }
+                                                    transformationMethod = PasswordTransformationMethod.getInstance()
                                                 }
 
                                                 if(!init.use_under_bar) sub_parent_input_view_password.visibility = View.GONE
@@ -1375,6 +1416,9 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
                                                             .apply {
                                                                 background = ContextCompat.getDrawable(mContext, android.R.color.transparent)
 
+                                                                inputType = InputType.TYPE_CLASS_TEXT
+                                                                privateImeOptions = "defaultInputmode=english"
+
                                                                 hint = editText_password_confirm_hint_value
                                                                 setHintTextColor(editText_hint_color)
 
@@ -1392,6 +1436,7 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
                                                                 setMargins((mDevWidth.toFloat() * signup_sub_parent_input_editTextView_marginLeft).toInt(),0,0, 0)
                                                             }
                                                     }
+                                                    transformationMethod = PasswordTransformationMethod.getInstance()
                                                 }
 
                                                 if(!init.use_under_bar) sub_parent_input_view_password_confirm.visibility = View.GONE
@@ -1448,6 +1493,9 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
                                                         layoutParams = RelativeLayout.LayoutParams((mDevWidth.toFloat() * signup_sub_parent_input_editTextView_scaleX).toInt(), (mDevHeight.toFloat() * signup_sub_parent_input_editTextView_scaleY).toInt())
                                                             .apply {
                                                                 background = ContextCompat.getDrawable(mContext, android.R.color.transparent)
+
+                                                                inputType = InputType.TYPE_CLASS_TEXT
+                                                                privateImeOptions = "defaultInputmode=korean"
 
                                                                 hint = editText_name_hint_value
                                                                 setHintTextColor(editText_hint_color)
@@ -2595,7 +2643,44 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
         viewModel.observerAgreementItem1 = object : Observer<Void> {
             var disposable: Disposable? = null
             override fun onComplete() {
-                Snackbar.make(contentView!!,"이용약관 보여주기", Snackbar.LENGTH_SHORT).show()
+                when(init.signup_terms_type) {
+                    Utils.EnumTermsType.INTERNAL -> {
+                        getViewUtil()?.addView("signupTerms", init.createTermsWebView(mContext), ViewUtil.ANIMATION_FADE_IN, ViewUtil.ANIMATION_FADE_OUT, object : ViewUtil.addViewInitListener {
+                            override fun onCreateView(webView: View?) {
+                                init.apply {
+                                    signup_contentView_type_A_linearLayout.apply {
+                                        val webViewLinearLayoutParams = LinearLayout.LayoutParams((mDevWidth.toFloat() * 0.8f).toInt(), (mDevHeight.toFloat() * 0.8f).toInt()).apply {
+                                            gravity = Gravity.CENTER
+                                        }
+
+                                        layoutParams = webViewLinearLayoutParams
+                                        backgroundColor = Color.GRAY
+                                        gravity = Gravity.CENTER
+                                    }
+
+
+                                    val webViewFrameLayoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
+                                        gravity = Gravity.CENTER
+                                        setMargins(30, 30, 30, 30)
+                                    }
+                                    signup_contentView_Type_A_webView.apply {
+                                        layoutParams = webViewFrameLayoutParams
+                                        webViewClient = WebViewClient()
+                                        loadUrl("https://www.naver.com")
+                                    }
+                                }
+                            }
+
+                            override fun onRemove() {
+
+                            }
+                        })
+                    }
+                    Utils.EnumTermsType.EXTERNAL -> {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.naver.com")))
+                    }
+                }
+                Snackbar.make(contentView!!,"이용약관", Snackbar.LENGTH_SHORT).show()
             }
 
             override fun onSubscribe(d: Disposable) {
@@ -2610,7 +2695,44 @@ open class initActivity : BaseKotlinActivity<ViewModel>() {
         viewModel.observerAgreementItem2 = object : Observer<Void> {
             var disposable: Disposable? = null
             override fun onComplete() {
-                Snackbar.make(contentView!!,"개인정보취급방침 보여주기", Snackbar.LENGTH_SHORT).show()
+                when(init.signup_terms_type) {
+                    Utils.EnumTermsType.INTERNAL -> {
+                        getViewUtil()?.addView("signupTerms", init.createTermsWebView(mContext), ViewUtil.ANIMATION_FADE_IN, ViewUtil.ANIMATION_FADE_OUT, object : ViewUtil.addViewInitListener {
+                            override fun onCreateView(webView: View?) {
+                                init.apply {
+                                    signup_contentView_type_A_linearLayout.apply {
+                                        val webViewLinearLayoutParams = LinearLayout.LayoutParams((mDevWidth.toFloat() * 0.8f).toInt(), (mDevHeight.toFloat() * 0.8f).toInt()).apply {
+                                            gravity = Gravity.CENTER
+                                        }
+
+                                        layoutParams = webViewLinearLayoutParams
+                                        backgroundColor = Color.GRAY
+                                        gravity = Gravity.CENTER
+                                    }
+
+
+                                    val webViewFrameLayoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT).apply {
+                                        gravity = Gravity.CENTER
+                                        setMargins(30, 30, 30, 30)
+                                    }
+                                    signup_contentView_Type_A_webView.apply {
+                                        layoutParams = webViewFrameLayoutParams
+                                        webViewClient = WebViewClient()
+                                        loadUrl("https://www.naver.com")
+                                    }
+                                }
+                            }
+
+                            override fun onRemove() {
+
+                            }
+                        })
+                    }
+                    Utils.EnumTermsType.EXTERNAL -> {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.naver.com")))
+                    }
+                }
+                Snackbar.make(contentView!!,"개인정보취급방침", Snackbar.LENGTH_SHORT).show()
             }
 
             override fun onSubscribe(d: Disposable) {

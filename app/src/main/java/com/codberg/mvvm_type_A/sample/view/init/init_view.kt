@@ -1,9 +1,11 @@
 package com.codberg.mvvm_type_A.sample.view.init
 
 import android.content.Context
+import android.graphics.Color
 import android.view.Gravity
 import android.view.View
 import android.view.ViewManager
+import android.webkit.WebView
 import android.widget.*
 import androidx.viewpager2.widget.ViewPager2
 import com.codberg.mvvm_type_A.R
@@ -268,6 +270,22 @@ class init_view(val viewModel: ViewModel): init_data() {
     }
 
     /**----------------------------------------------------------------**/
+    lateinit var signup_contentView_type_A_main_linearLayout: LinearLayout
+    lateinit var signup_contentView_type_A_linearLayout: LinearLayout
+    lateinit var signup_contentView_Type_A_webView: WebView
+
+    fun createTermsWebView(mContext: Context): View {
+        return mContext.UI {
+            signup_contentView_type_A_main_linearLayout = linearLayout {
+                isClickable = true
+                gravity = Gravity.CENTER
+                backgroundColor = Color.parseColor("#CC000000")
+                signup_contentView_type_A_linearLayout = linearLayout {
+                    signup_contentView_Type_A_webView = webView {  }
+                }
+            }
+        }.view
+    }
 
     /** [Find Id and Password] --------------------------------------------- **/
 
